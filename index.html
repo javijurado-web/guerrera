@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#15130f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Guerrera">
+<title>Guerrera Espartana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DISEÑO "BRONCE Y ESCARLATA": fondo carbón cálido, acento rojo
+   espartano (capa) y bronce (escudo). Mismo esqueleto que Barra Libre.
+   ============================================================ */
+:root{
+  --bg:#15130f; --surface:#1e1b17; --surface-2:#28241f; --line:#3a342c;
+  --text:#ece7df; --muted:#a59c90; --faint:#6b6358;
+  --accent:#d9473f; --accent-deep:#9e2a24; --ok:#4bae6e; --warn:#e0b020; --bad:#e0594e;
+  --warm:#e6b867; --blue:#5aa7d8;
+  --radius:14px;
+  --p25:#d12c2c; --p20:#2f6fd0; --p15:#e0b020; --p10:#3aa657; --p5:#e8eaed; --p2:#c0392b; --p1:#9aa3ad;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.45;
+  padding-bottom:env(safe-area-inset-bottom);overscroll-behavior-y:contain}
+h1,h2,h3,.cond{font-family:'Barlow Condensed',sans-serif;letter-spacing:.01em}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.hidden{display:none!important}
+header{position:sticky;top:0;z-index:20;background:rgba(21,19,15,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand b{font-family:'Barlow Condensed';font-weight:800;font-size:19px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.brand b span{color:var(--accent)}
+.shield{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f1cf8a,var(--warm) 45%,#8a6526);
+  display:flex;align-items:center;justify-content:center;color:var(--accent-deep);font-family:'Barlow Condensed';font-weight:800;font-size:18px;flex:none;box-shadow:inset 0 0 0 2px rgba(0,0,0,.25)}
+.session-pill{font-family:'Barlow Condensed';font-weight:700;font-size:12.5px;text-transform:uppercase;background:var(--surface-2);
+  border:1px solid var(--line);padding:5px 10px;border-radius:999px;color:var(--warm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62vw}
+main{max-width:560px;margin:0 auto;padding:16px 14px 100px}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(21,19,15,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;padding:8px 4px calc(env(safe-area-inset-bottom) + 8px)}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--faint);font-size:9.5px;font-weight:600;padding:4px 1px}
+nav button .ic{font-size:17px;line-height:1}
+nav button.active{color:var(--accent)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 15px;cursor:pointer}
+.card-head .left{display:flex;align-items:center;gap:9px;min-width:0;flex-wrap:wrap}
+.ex-name{font-family:'Barlow Condensed';font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.02em}
+.ex-scheme{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
+.ss-tag{font-family:'Barlow Condensed';font-weight:800;font-size:12px;color:#1a0806;background:var(--warm);border-radius:6px;padding:1px 6px}
+.chev{color:var(--faint);transition:transform .18s;font-size:12px}
+.card.open .chev{transform:rotate(90deg)}
+.card-body{display:none;border-top:1px solid var(--line);padding:8px 15px 14px}
+.card.open .card-body{display:block}
+.body-open{display:block;border:none}
+.done-tag{font-size:11px;font-weight:700;color:var(--ok);font-family:'Barlow Condensed';text-transform:uppercase}
+.fail-tag{font-size:11px;font-weight:700;color:var(--bad);font-family:'Barlow Condensed';text-transform:uppercase}
+.mid-tag{font-size:11px;font-weight:700;color:var(--warn);font-family:'Barlow Condensed';text-transform:uppercase}
+.opt-badge{font-family:'Barlow Condensed';font-weight:700;font-size:10px;text-transform:uppercase;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:99px;padding:1px 7px;vertical-align:middle}
+.set-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--surface-2)}
+.set-row:last-child{border-bottom:none}
+.set-meta{flex:none;width:84px}
+.set-meta .lbl{font-size:11px;color:var(--faint);font-weight:600;text-transform:uppercase}
+.set-meta .reps{font-family:'Barlow Condensed';font-weight:600;font-size:15px;color:var(--muted)}
+.set-w{flex:1;display:flex;align-items:baseline;gap:5px}
+.set-w .kg{font-family:'Barlow Condensed';font-weight:800;font-size:28px;line-height:1}
+.set-w .u{font-size:12px;color:var(--faint);font-weight:600}
+.set-w.workset .kg{color:var(--warm)}
+.tick{flex:none;width:42px;height:42px;border-radius:11px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:transparent;background:var(--surface-2);transition:.12s}
+.tick.on{background:var(--ok);border-color:var(--ok);color:#0c140f}
+.tick:active{transform:scale(.92)}
+.barbell{display:flex;align-items:center;justify-content:center;gap:1px;height:38px;margin:6px 0 4px}
+.barbell .sleeve{height:6px;width:24px;background:var(--faint);border-radius:2px}
+.plate{border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:10px;color:#0c0f13;min-width:11px}
+.plate.t{color:#fff}
+.platecalc-note{font-size:11px;color:var(--faint);text-align:center;margin-top:-2px}
+.btn{display:block;width:100%;text-align:center;font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  font-size:17px;padding:14px;border-radius:12px;background:var(--accent);color:#fff}
+.btn:active{filter:brightness(.92)}
+.btn.ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--line)}
+.btn.deep{background:var(--accent-deep);color:#fff}
+.btn.sm{font-size:14px;padding:9px 12px;width:auto;display:inline-block}
+.btn:disabled{opacity:.4}
+.btn-row{display:flex;gap:10px;margin:14px 0}
+.btn-row .btn{margin:0}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:5px;text-transform:uppercase;letter-spacing:.03em}
+input[type=number],input[type=text],input[type=date],select,textarea{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;
+  color:var(--text);padding:11px;font-size:16px;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.inline-num{width:64px!important;padding:8px 4px!important;text-align:center}
+.eyebrow{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-size:13px;margin:2px 0 10px}
+.h-big{font-family:'Barlow Condensed';font-weight:800;font-size:28px;text-transform:uppercase;line-height:1.05;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+.help{font-size:13px;color:var(--muted);background:var(--surface-2);border-left:3px solid var(--warm);border-radius:8px;padding:10px 12px;margin-top:8px}
+.help b{color:var(--text)}
+.pageref{display:inline-block;margin-top:5px;color:var(--warm);font-weight:600;font-size:12px}
+.note{background:var(--surface-2);border-left:3px solid var(--accent);border-radius:8px;padding:10px 12px;font-size:13.5px;color:var(--muted);margin:10px 0}
+.note b{color:var(--text)}
+.note.ok{border-left-color:var(--ok)} .note.warn{border-left-color:var(--bad)}
+.tiny{font-size:12px;color:var(--faint)}
+.center{text-align:center}
+hr.sep{border:none;border-top:1px solid var(--line);margin:18px 0}
+.prevline{font-size:12.5px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:7px 10px;margin-bottom:10px}
+.prevline b{color:var(--text)}
+.dlt{font-family:'Barlow Condensed';font-weight:700;margin-left:3px;white-space:nowrap}
+.dlt.up{color:var(--ok)} .dlt.dn{color:var(--bad)} .dlt.eq{color:var(--warn)}
+.stat-line{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--surface-2);font-size:14px}
+.stat-line:last-child{border:none}
+.stat-line b{font-family:'Barlow Condensed';font-weight:700;color:var(--warm);font-size:17px;text-align:right}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:var(--accent);color:#fff;font-weight:700;font-family:'Barlow Condensed';
+  text-transform:uppercase;padding:11px 20px;border-radius:999px;z-index:70;opacity:0;transition:.25s;pointer-events:none;font-size:14px;letter-spacing:.03em;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.modal{position:fixed;inset:0;z-index:60;background:rgba(8,7,6,.72);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.modal-box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;max-width:380px;width:100%;max-height:88vh;overflow-y:auto}
+.modal-box p.msg{margin:0 0 16px;font-size:15px;white-space:pre-line}
+.dl-title{font-family:'Barlow Condensed';font-weight:800;font-size:21px;text-transform:uppercase;margin:0 0 8px;color:var(--accent)}
+.dl-intro{font-size:13.5px;color:var(--muted);margin:0 0 12px}
+.dl-cause{display:flex;gap:10px;align-items:flex-start;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;font-size:13px;color:var(--muted);cursor:pointer}
+.dl-cause input{width:20px;height:20px;flex:none;margin-top:1px;accent-color:var(--accent)}
+.dl-cause b{color:var(--text)}
+.dl-box{background:rgba(217,71,63,.08);border:1px solid rgba(217,71,63,.3);border-radius:10px;padding:11px;margin:10px 0 4px;font-size:13.5px}
+.dl-prev{background:var(--bg);border-radius:8px;padding:8px 10px;margin:8px 0 6px;font-size:14px;line-height:1.7}
+.dl-prev b{color:var(--warm)}
+.rest-pill{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);z-index:40;display:none;align-items:center;gap:12px;
+  background:var(--accent);color:#fff;padding:9px 12px 9px 18px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.45);font-family:'Barlow Condensed';font-weight:700;opacity:0;transition:.25s}
+.rest-pill.show{display:flex;opacity:1;transform:translateX(-50%) translateY(0)}
+.rest-pill .rest-lbl{text-transform:uppercase;font-size:13px;letter-spacing:.05em;opacity:.85}
+.rest-pill #rest-time{font-size:24px;min-width:62px;text-align:center;font-variant-numeric:tabular-nums}
+.rest-pill button{background:rgba(0,0,0,.2);color:#fff;width:28px;height:28px;border-radius:50%;font-size:14px;font-weight:700}
+.itimer{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom));background:var(--accent);color:#fff;border-radius:14px;
+  padding:11px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 28px rgba(0,0,0,.5);z-index:65;min-width:250px}
+.itimer.rest{background:var(--ok);color:#0c140f}
+.it-lab{font-family:'Barlow Condensed';font-weight:700;font-size:15px;text-transform:uppercase;flex:1;line-height:1.1}
+.it-lab small{display:block;font-size:11px;opacity:.8}
+.it-time{font-family:'Barlow Condensed';font-weight:800;font-size:26px;font-variant-numeric:tabular-nums}
+.it-x{background:rgba(0,0,0,.2);color:inherit;width:26px;height:26px;border-radius:50%;font-size:13px}
+/* Segmentados / pestañas */
+.seg{display:flex;gap:5px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:14px}
+.seg button{flex:1;font-family:'Barlow Condensed';font-weight:700;font-size:15px;text-transform:uppercase;color:var(--muted);border-radius:9px;padding:9px 2px;letter-spacing:.02em}
+.seg button.sel{background:var(--accent);color:#fff}
+.seg .pdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--warm);vertical-align:middle;margin-left:3px}
+.ntabs{display:flex;gap:6px;overflow-x:auto;margin:0 0 14px;padding-bottom:4px}
+.ntabs button{flex:none;font-family:'Barlow Condensed';font-weight:700;font-size:13px;padding:8px 12px;border-radius:9px;background:var(--surface);
+  border:1px solid var(--line);color:var(--muted);text-transform:uppercase;white-space:nowrap}
+.ntabs button.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+.ntabs button:disabled{opacity:.4}
+/* Resultado 3 estados + esfuerzo */
+.out-q{font-size:13px;color:var(--muted);font-weight:600;display:block;margin-bottom:7px}
+.outcome3{display:flex;gap:7px}
+.o3{flex:1;font-family:'Barlow Condensed';font-weight:700;font-size:14px;padding:10px 4px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted);text-align:center}
+.o3.ok.sel{background:var(--ok);border-color:var(--ok);color:#0c140f}
+.o3.mid.sel{background:var(--warn);border-color:var(--warn);color:#1a1405}
+.o3.no.sel{background:var(--bad);border-color:var(--bad);color:#1a0a08}
+.o3-next{margin-top:8px;font-size:13px;color:var(--muted);background:var(--surface-2);border-radius:8px;padding:8px 10px}
+.o3-next b{color:var(--warm)}
+.rir{display:flex;gap:6px;margin-top:7px}
+.rir-b{flex:1;font-family:'Barlow Condensed';font-weight:700;font-size:17px;padding:9px 0;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+.rir-b.sel{color:#160a02;border-color:transparent}
+.rir-b.l1.sel{background:#4bae6e}.rir-b.l2.sel{background:#8bbf3f}.rir-b.l3.sel{background:#e0b020}.rir-b.l4.sel{background:#e08a2e}.rir-b.l5.sel{background:#e0594e}
+.blk{margin-top:12px}
+.stall-note{background:rgba(224,89,78,.1);border:1px solid rgba(224,89,78,.35);border-radius:9px;padding:10px 12px;font-size:13px;color:var(--warm);margin:8px 0}
+.edit-w{background:var(--surface-2);border:1px solid var(--line);color:var(--warm);width:26px;height:26px;border-radius:7px;font-size:13px;flex:none;padding:0}
+/* Inputs de series (peso corporal / doble progresión) */
+.sets-grid{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.sg{display:flex;flex-direction:column;align-items:center;gap:3px}
+.sg span{font-family:'Barlow Condensed';font-weight:700;font-size:11px;color:var(--muted)}
+.sg input{width:54px;text-align:center;padding:9px 2px}
+.lvl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 6px}
+.lvl-row .lv{font-family:'Barlow Condensed';font-weight:700;font-size:13px;padding:6px 11px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+.lvl-row .lv.sel{background:var(--warm);color:#1a0806;border-color:var(--warm)}
+.lvl-row .lbl2{font-size:12px;color:var(--muted);font-weight:600}
+.acc-input{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 0}
+.acc-input span{font-size:13px;color:var(--muted)}
+.wu-box{background:var(--surface-2);border-radius:9px;padding:8px 10px;margin:8px 0}
+.wu-t{font-family:'Barlow Condensed';font-weight:700;font-size:12px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px}
+.wu-s{display:flex;justify-content:space-between;font-size:13px;padding:2px 0;color:var(--muted)}
+.wu-s b{color:var(--text)}
+.wu-list{margin:4px 0 0;padding-left:18px;font-size:13.5px;color:var(--muted)}
+.wu-list li{margin-bottom:3px}
+.warmup-card{border-color:rgba(230,184,103,.35)}
+/* Ciclo */
+.cycle{border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;border:1px solid var(--line);background:var(--surface)}
+.cycle-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cycle-ph{font-family:'Barlow Condensed';font-weight:800;font-size:18px;text-transform:uppercase}
+.cycle-day{font-size:12px;color:var(--muted);font-weight:600}
+.cycle ul{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--muted)}
+.cycle li{margin-bottom:3px}
+.cycle.menstrual{border-color:#b33a4a;background:linear-gradient(135deg,rgba(179,58,74,.16),var(--surface) 60%)}
+.cycle.folicular{border-color:#4bae6e;background:linear-gradient(135deg,rgba(75,174,110,.14),var(--surface) 60%)}
+.cycle.ovulatoria{border-color:#e0b020;background:linear-gradient(135deg,rgba(224,176,32,.14),var(--surface) 60%)}
+.cycle.lutea{border-color:#5aa7d8;background:linear-gradient(135deg,rgba(90,167,216,.14),var(--surface) 60%)}
+.cyc-bar{display:flex;height:8px;border-radius:99px;overflow:hidden;margin-top:9px;position:relative}
+.cyc-bar div{height:100%}
+.cyc-mark{position:absolute;top:-3px;width:3px;height:14px;background:var(--text);border-radius:2px}
+/* Progreso */
+.progress-pick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.progress-pick button{font-family:'Barlow Condensed';font-weight:700;font-size:13px;padding:7px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.progress-pick button.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chart-wrap{position:relative}
+.chart{width:100%;height:auto;display:block;background:var(--surface);border:1px solid var(--line);border-radius:12px;touch-action:none;cursor:crosshair}
+.chart-tip{position:absolute;top:6px;transform:translateX(-50%);background:#0e0d0b;border:1px solid var(--line);color:var(--text);font-size:12px;padding:5px 9px;border-radius:8px;
+  pointer-events:none;opacity:0;transition:opacity .1s;white-space:nowrap;z-index:5}
+.chart-tip b{color:var(--warm)}
+.chart-ctrls{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.cbtn{width:42px;height:34px;border-radius:9px;background:var(--surface);border:1px solid var(--line);color:var(--text);font-size:16px;font-weight:700}
+.chart-legend{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:8px}
+.lg-line{display:inline-block;width:16px;height:0;border-top:2px solid;vertical-align:middle;margin-left:8px}
+.ov-wrap{display:flex;flex-direction:column;gap:10px}
+.ov-row{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:10px 12px;cursor:pointer}
+.ov-row.cur{border-color:var(--accent)}
+.ov-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.ov-name{font-family:'Barlow Condensed';font-weight:700;font-size:16px;text-transform:uppercase}
+.ov-pcts{font-family:'Barlow Condensed';font-weight:700;font-size:17px;color:var(--accent)}
+.ov-bar{position:relative;height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.ov-ghost{position:absolute;left:0;top:0;height:100%;background:rgba(230,184,103,.25);border-radius:99px}
+.ov-fill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--accent-deep),var(--accent));border-radius:99px;z-index:2}
+.ov-sub{margin-top:6px;font-size:12px;color:var(--muted)}
+.ov-sub b{color:var(--text)}
+/* Calendario */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}
+.cal-nav{font-size:24px;color:var(--accent);width:42px;height:42px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-dow div{text-align:center;font-size:11px;color:var(--faint);font-weight:700;padding-bottom:4px;font-family:'Barlow Condensed'}
+.cal-cell{aspect-ratio:1;border-radius:9px;background:var(--surface);border:1px solid var(--line);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:40px}
+.cal-cell.empty{background:transparent;border:none}
+.cal-cell.f{background:rgba(217,71,63,.14);border-color:rgba(217,71,63,.4)}
+.cal-cell.h{background:rgba(230,184,103,.12);border-color:rgba(230,184,103,.35)}
+.cal-cell.today{outline:2px solid var(--accent);outline-offset:-1px}
+.cal-cell .regla{position:absolute;bottom:3px;width:5px;height:5px;border-radius:50%;background:#e05a74}
+.cal-d{font-family:'Barlow Condensed';font-weight:600;font-size:13px;color:var(--muted)}
+.cal-lab{font-family:'Barlow Condensed';font-weight:700;font-size:10.5px;color:var(--warm);line-height:1}
+.cal-cell.f .cal-lab{color:#ff8a80}
+.cal-chk{position:absolute;top:2px;right:4px;font-size:10px;color:var(--ok)}
+.cal-legend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:12px 0}
+.cal-legend .lg{width:13px;height:13px;border-radius:4px;display:inline-block}
+.wk{display:flex;flex-direction:column;gap:6px}
+.wkd{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.wkd.rest{opacity:.5}.wkd.now{border-color:var(--accent)}
+.wkd-d{font-family:'Barlow Condensed';font-weight:800;font-size:15px;color:var(--warm);width:36px}
+.wkd-n{flex:1;font-size:14px}
+.wkd-tag{font-family:'Barlow Condensed';font-weight:700;font-size:11px;color:#fff;background:var(--accent);padding:2px 8px;border-radius:99px}
+.hist-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.hist-d{font-family:'Barlow Condensed';font-weight:700;color:var(--muted);min-width:72px;font-size:13px}
+/* HIIT grid */
+.hiit-grid{display:grid;gap:6px;align-items:center}
+.hg-h{font-family:'Barlow Condensed';font-weight:700;font-size:12px;text-transform:uppercase;color:var(--muted);text-align:center}
+.hg-r{font-family:'Barlow Condensed';font-weight:700;font-size:14px;color:var(--warm);text-align:center;min-width:26px}
+.hg-i{width:100%;padding:9px 2px!important;text-align:center}
+.hg-t{font-family:'Barlow Condensed';font-weight:800;font-size:18px;color:var(--accent);text-align:center}
+.alt-toggle{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--muted);cursor:pointer;margin-top:10px}
+.alt-toggle input{width:18px;height:18px;accent-color:var(--accent)}
+/* Nutrición */
+.res-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:9px 0;border-bottom:1px solid var(--surface-2)}
+.res-row:last-child{border:none}
+.res-row .rn{font-weight:600;font-size:14px}
+.res-row .rn small{display:block;color:var(--faint);font-weight:500;font-size:11.5px}
+.res-row .kcal{font-family:'Barlow Condensed';font-weight:800;font-size:21px;color:var(--warm);text-align:right}
+.res-row .macros{font-family:'Barlow Condensed';font-weight:600;font-size:13px;color:var(--muted);text-align:right}
+.res-row.rec{background:rgba(217,71,63,.08);border-radius:8px;padding:9px 8px}
+.kv{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--surface-2);font-size:14px}
+.kv:last-child{border:none}
+.kv .k{font-weight:600;min-width:100px;color:var(--warm)}
+.tag{display:inline-block;font-family:'Barlow Condensed';font-weight:700;font-size:11px;text-transform:uppercase;padding:3px 9px;border-radius:999px;margin:0 5px 5px 0}
+.tag.bloc{background:rgba(217,71,63,.16);color:#ff9a90;border:1px solid rgba(217,71,63,.4)}
+.tag.sup{background:rgba(75,174,110,.14);color:#86d6a4;border:1px solid rgba(75,174,110,.35)}
+.foodcol{margin:10px 0}
+.foodcol .lbl{font-family:'Barlow Condensed';font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.fdot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.fdot.ok{background:var(--ok)}.fdot.mod{background:var(--warn)}.fdot.no{background:var(--bad)}
+.foodcol .items{font-size:13.5px;color:var(--muted);line-height:1.7}
+.pyr{display:flex;flex-direction:column;align-items:center;gap:4px;margin:6px 0}
+.pyr div{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:7px 10px;text-align:center;font-family:'Barlow Condensed';font-weight:700;font-size:14px;text-transform:uppercase}
+.feel{display:flex;gap:5px;margin-top:4px}
+.feel button{flex:1;padding:8px 0;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);font-family:'Barlow Condensed';font-weight:700;color:var(--muted)}
+.feel button.sel{background:var(--warm);color:#1a0806;border-color:var(--warm)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="shield">Λ</span><b>GUERRERA<span> Λ</span></b></div>
+  <div class="session-pill" id="pill">—</div>
+</header>
+<main id="app"></main>
+<nav>
+  <button data-view="hoy" class="active"><span class="ic">🏋️</span>Hoy</button>
+  <button data-view="plan"><span class="ic">🗓️</span>Plan</button>
+  <button data-view="historial"><span class="ic">📋</span>Historial</button>
+  <button data-view="progreso"><span class="ic">📈</span>Progreso</button>
+  <button data-view="cuerpo"><span class="ic">🌸</span>Cuerpo</button>
+  <button data-view="dieta"><span class="ic">🥗</span>Dieta</button>
+  <button data-view="ajustes"><span class="ic">⚙️</span>Ajustes</button>
+</nav>
+<div class="toast" id="toast"></div>
+<div class="rest-pill" id="rest"><span class="rest-lbl">Descanso</span><span id="rest-time">2:00</span><button id="rest-skip" aria-label="Saltar descanso">✕</button></div>
+<div class="modal" id="modal"><div class="modal-box"><p class="msg" id="modal-msg"></p>
+  <div class="btn-row"><button class="btn ghost" id="modal-no">Cancelar</button><button class="btn deep" id="modal-yes">Aceptar</button></div></div></div>
+<div class="modal" id="dlg"><div class="modal-box" id="dlg-box"></div></div>
+<script>
+/* ====================================================================
+   GUERRERA ESPARTANA — app de entrenamiento fiel al libro (Fitness Revolucionario)
+   Fase I Fundamentos (corporal) · Fase II Fuerza (full-body lineal) ·
+   Fase III Hipertrofia (torso-pierna ondulante) · Fase IV Ajuste final (por biotipo)
+   ==================================================================== */
+
+/* ---------- 1) Configuración por defecto ---------- */
+const KEY='guerrera_v2';
+const DEFAULTS={
+  bar:20, minInc:1,
+  plates:[20,15,10,5,2.5,1.25,1,0.5],
+  restBarra:120, restCorp:60,             // pág. 235: 2 min barra · 1 min corporales
+  descarga:0.40,                          // pág. 236: resta un 40% a tu 5RM estimado
+  inc:{inf1:3, sup1:2, inf2:2, sup2:1},   // pág. 241: 1er mes 3-4 / 2-3 kg · 2º mes 2-3 / 1 kg
+  kettlebell:false, clean:true, bancoReg:false,
+  f1modo:'5d', f2total:24,
+  rm:{sentadilla:40, banca:25, peso_muerto:50, militar:20, glute_bridge:50, hip_thrust:45, clean:20, remo:25},
+  deloads:{}, resumeDate:null, biotipo:null,
+  nutri:{}, comidaActual:null
+};
+
+/* ---------- 2) Datos del libro ---------- */
+// Básicos con barra de la Fase II (pág. 233-235)
+const LIFTS={
+  sentadilla:{label:'Sentadilla',grp:'inf',wg:'pierna',sets:3,reps:5,page:86,
+    cues:['Barra sobre los trapecios (nunca el cuello), omóplatos juntos.','Arranca llevando la cadera atrás; ¡rodillas afuera!, sobre los pies.','Peso en talones, barra vertical sobre el pie.','Baja al menos a paralelo; cadera y hombros suben a la vez.']},
+  banca:{label:'Press banca',grp:'sup',wg:'empuje',sets:3,reps:5,page:95,
+    cues:['Omóplatos juntos y abajo; pies plantados en el suelo.','Antebrazo vertical, codo ~45°: toca entre mitad del pecho y final del esternón.','Toca la camiseta, sin rebotar; codos bloqueados al sacar y devolver la barra.','Pulgar siempre rodeando la barra.']},
+  peso_muerto:{label:'Peso muerto',grp:'inf',wg:'pierna',sets:2,reps:5,page:90,
+    cues:['Barra a mitad de espinilla, pies bajo la cadera.','Espalda recta y tensa, pecho arriba: NUNCA encorvar.','Barra pegada a las piernas; los brazos solo sujetan.','Bloquea cadera arriba y baja controlando.']},
+  glute_bridge:{label:'Levantamiento de cadera con barra',grp:'inf',wg:'pierna',sets:3,reps:5,page:110,
+    cues:['Hombros en el suelo, barra sobre la cadera con protección.','Empuja con los talones, glúteos apretados arriba.','Lumbar neutra: la cadera la mueven los glúteos, no la espalda.']},
+  hip_thrust:{label:'Hip thrust',grp:'inf',wg:'pierna',sets:3,reps:5,page:108,
+    cues:['Espalda alta en el banco (por debajo de las axilas), pies algo más abiertos que la cadera.','Peso en talones, espinillas casi verticales, rodillas sin ir hacia dentro.','Arriba torso y cadera en bloque: 1 s de contracción.','No “enseñes las costillas”; baja sin dejarte caer.']},
+  militar:{label:'Press militar',grp:'sup',wg:'empuje',sets:3,reps:5,page:100,
+    cues:['Barra en clavículas, sobre el talón de la mano; codos algo adelante.','Glúteos y abdomen tensos, mirada al frente.','Aparta la cabeza, y métete bajo la barra al pasar la frente.','Bloquea arriba con “hombros activos”.']},
+  clean:{label:'Clean',grp:'sup',wg:'clean',sets:5,reps:3,page:102,
+    cues:['Del suelo como un peso muerto hasta la posición de salto.','Abre la cadera de forma explosiva; brazos rectos hasta entonces.','Encoge trapecios, gira codos y recibe en rack con rodillas flexionadas.','Barra siempre pegada; técnica antes que peso.']},
+  remo:{label:'Remo con barra',grp:'sup',wg:'tiron',sets:3,reps:5,page:115,
+    cues:['Torso casi paralelo, hombros por encima de la cadera, lumbar firme.','La barra sale del suelo y vuelve al suelo en cada repetición.','Tira hacia las costillas inferiores, pecho arriba.','Si bajas el torso para acortar recorrido: demasiado peso.']}
+};
+// Estándar para dejar de ser novata (pág. 79), 1RM × peso corporal
+const STD={sentadilla:0.8, peso_muerto:1.1, banca:0.6, militar:0.4, hip_thrust:0.9};
+const EP=r=>1+r*0.0333;              // pág. 237: 1RM ≈ peso·reps·0,0333 + peso
+
+/* Accesorios corporales de la Fase II */
+const F2_ACC={
+  A:[{id:'f2_dom',label:'Dominada',kind:'reps',sets:3,reps:'F',lvls:3,lvl:2,page:124,note:'Al fallo. Alterna agarre: 1ª prono, 2ª supino, 3ª prono. Si no haces 3 en nivel 3, usa nivel 2 (asistida) o 1.'},
+     {id:'f2_plank',label:'Plancha abdominal',kind:'time',sets:2,secs:120,page:144,note:'2 × 2 min. Si no llegas, apunta tu tiempo y súbelo poco a poco.'}],
+  B:[{id:'f2_cuad',label:'Elevación de pierna cuadrúpeda',kind:'reps',sets:4,reps:'10-15',perSide:true,page:138,note:'Aguanta 1 s arriba apretando el glúteo. Puedes añadir tobilleras con lastre.'},
+     {id:'f2_plankL',label:'Plancha lateral',kind:'time',sets:2,secs:60,perSide:true,page:144,note:'2 × 1 min por lado.'}]
+};
+
+/* Fase I · Fundamentos: sesiones semanales (pág. 214-217) */
+const L={lev:'Levantamiento de cadera',ht:'Hip thrust (sin peso)'};
+const F1={
+ A:{1:[{id:'levc',ss:'A1',label:L.lev,kind:'reps',sets:4,reps:'15-20',lvls:4,lvl:1,page:129,note:'Si el nivel 1 es fácil, usa el 2.'},
+       {id:'sentc',ss:'A2',label:'Sentadilla (sin peso)',kind:'reps',sets:4,reps:'15-20',page:140,note:'Más apertura de piernas (sumo) = más glúteo.'},
+       {id:'levlat',ss:'B',label:'Levantamiento de cadera lateral',kind:'reps',sets:4,reps:'10',perSide:true,page:132,note:'Un lado e inmediatamente el otro; descansa al terminar ambos.'},
+       {id:'marcha',ss:'C1',label:'Marcha de glúteos',kind:'reps',sets:4,reps:'30',page:136,note:'30 seguidas alternando (15 por pierna).'},
+       {id:'desp',ss:'C2',label:'Desplantes',kind:'reps',sets:4,reps:'30',page:142,note:'15 por pierna. Alterna sentido: serie 1 adelante, 2 atrás, 3 adelante, 4 atrás.'}],
+    2:[{id:'levc',ss:'A',label:L.lev,kind:'reps',sets:4,reps:'10-15',perSide:true,lvls:4,lvl:2,page:130,note:'Nivel 2: a una pierna.'},
+       {id:'ht',ss:'B1',label:L.ht,kind:'reps',sets:4,reps:'15-20',lvls:4,lvl:1,page:133},
+       {id:'desplat',ss:'B2',label:'Desplantes laterales',kind:'reps',sets:4,reps:'10',perSide:true,page:143},
+       {id:'abd',ss:'C1',label:'Abducción de cadera a una pierna',kind:'reps',sets:4,reps:'15-20',perSide:true,page:137,note:'Puedes usar banda elástica.'},
+       {id:'cuad',ss:'C2',label:'Elevación de pierna cuadrúpeda',kind:'reps',sets:4,reps:'10-15',perSide:true,page:138}],
+    3:[{id:'levc',ss:'A',label:L.lev+' (pies elevados)',kind:'reps',sets:4,reps:'15-20',lvls:4,lvl:3,page:131},
+       {id:'extp',ss:'B1',label:'Extensión de cadera en prono',kind:'reps',sets:4,reps:'10',perSide:true,page:138},
+       {id:'ht',ss:'B2',label:L.ht,kind:'reps',sets:4,reps:'10-15',perSide:true,lvls:4,lvl:2,page:134,note:'Nivel 2: a una pierna.'},
+       {id:'cuadlat',ss:'C1',label:'Elevación lateral de pierna cuadrúpeda',kind:'reps',sets:4,reps:'10-15',perSide:true,page:139},
+       {id:'bulg',ss:'C2',label:'Sentadilla búlgara',kind:'reps',sets:4,reps:'10-15',perSide:true,page:140,note:'En superset haz ambos ejercicios por ambos lados antes de descansar.'}],
+    4:[{id:'levc',ss:'A1',label:L.lev,kind:'reps',sets:4,reps:'15-20',perSide:true,lvls:4,lvl:4,page:132,note:'Nivel 4: pies elevados y una pierna.'},
+       {id:'levlat',ss:'A2',label:'Levantamiento de cadera lateral',kind:'reps',sets:4,reps:'10-15',perSide:true,page:132},
+       {id:'unap',ss:'B',label:'Sentadilla a una pierna asistida',kind:'reps',sets:4,reps:'5-10',perSide:true,page:141,note:'Marco de puerta o silla como apoyo.'},
+       {id:'ht',ss:'C1',label:L.ht,kind:'reps',sets:4,reps:'15-20',lvls:4,lvl:3,page:135,note:'Si el nivel 3 es fácil, nivel 4 (4×10-15 por pierna).'},
+       {id:'marcha',ss:'C2',label:'Marcha de glúteos',kind:'reps',sets:4,reps:'30',page:136}]},
+ B:{1:[{id:'flex',ss:'A1',label:'Flexión',kind:'reps',sets:4,reps:'15-20',lvls:3,lvl:1,page:121},
+       {id:'dom',ss:'A2',label:'Dominada (supino)',kind:'reps',sets:4,reps:'10',lvls:3,lvl:1,page:124,note:'Nivel 1: dominada horizontal / remo invertido.'},
+       {id:'flexv',ss:'B1',label:'Flexión vertical',kind:'reps',sets:4,reps:'10',lvls:3,lvl:1,page:122},
+       {id:'dips',ss:'B2',label:'Dips',kind:'reps',sets:4,reps:'10',page:128,note:'En el nivel más difícil que te deje llegar (p. ej. pies elevados).'},
+       {id:'plank',ss:'C',label:'Plancha abdominal',kind:'time',sets:2,secs:120,page:144,note:'60-120 s. Apunta tu tiempo para mejorarlo.'}],
+    2:[{id:'flex',ss:'A1',label:'Flexión',kind:'reps',sets:4,reps:'10-15',lvls:3,lvl:2,page:122},
+       {id:'dom',ss:'A2',label:'Dominada (prono)',kind:'reps',sets:4,reps:'10',lvls:3,lvl:1,page:126},
+       {id:'flexv',ss:'B1',label:'Flexión vertical',kind:'reps',sets:4,reps:'10',lvls:3,lvl:2,page:123},
+       {id:'dips',ss:'B2',label:'Dips',kind:'reps',sets:4,reps:'10',page:128},
+       {id:'plankL',ss:'C',label:'Plancha lateral',kind:'time',sets:2,secs:60,perSide:true,page:144,note:'45-60 s por lado, sin descanso al cambiar.'}],
+    3:[{id:'flex',ss:'A1',label:'Flexión',kind:'reps',sets:4,reps:'10-15',lvls:3,lvl:3,page:122},
+       {id:'dom',ss:'A2',label:'Dominada',kind:'reps',sets:4,reps:'8-10',lvls:3,lvl:2,page:127,note:'Nivel 2 (asistida). Alterna: prono, supino, prono, supino.'},
+       {id:'flexv',ss:'B1',label:'Flexión vertical',kind:'reps',sets:4,reps:'10',lvls:3,lvl:3,page:123},
+       {id:'levp',ss:'B2',label:'Levantamiento de piernas',kind:'reps',sets:4,reps:'8-10',page:145},
+       {id:'plank',ss:'C',label:'Plancha abdominal',kind:'time',sets:2,secs:120,page:144}],
+    4:[{id:'flex',ss:'A1',label:'Flexión',kind:'reps',sets:4,reps:'10-15',lvls:3,lvl:3,page:122},
+       {id:'dom',ss:'A2',label:'Dominada',kind:'reps',sets:4,reps:'4-6',lvls:3,lvl:3,page:128,note:'Nivel 3 (sin apoyo; vale iniciar con salto). Alterna agarre cada serie.'},
+       {id:'flexv',ss:'B1',label:'Flexión vertical',kind:'reps',sets:4,reps:'8-10',lvls:3,lvl:3,page:123},
+       {id:'levp',ss:'B2',label:'Levantamiento de piernas',kind:'reps',sets:4,reps:'8-10',page:145},
+       {id:'plankL',ss:'C',label:'Plancha lateral',kind:'time',sets:2,secs:60,perSide:true,page:144}]}
+};
+const LVL_TXT={
+  'Flexión':['Superficie elevada','Rodillas','Puntas de pies'],
+  'Flexión vertical':['Manos elevadas','Pies y manos en suelo','Pies elevados'],
+  'Dominada':['Horizontal / remo invertido','Asistida (silla/banda)','Sin apoyo'],
+  [L.lev]:['Básico','Una pierna','Pies elevados','Pies elevados + una pierna'],
+  [L.ht]:['Básico','Una pierna','Pies elevados','Pies elevados + una pierna']
+};
+function lvlNames(label){ const k=Object.keys(LVL_TXT).find(k=>label.startsWith(k)); return k?LVL_TXT[k]:null; }
+
+/* Fase III · Hipertrofia (pág. 251-254) */
+const F3_DAYS=[
+ {id:'tf',name:'Torso · Fuerza',tipo:'fuerza',rest:150,ex:[
+   {id:'tf_banca',base:'banca',label:'Press banca',kind:'carga',sets:3,rMin:3,rMax:5,page:95},
+   {id:'tf_mil',base:'militar',label:'Press militar',kind:'carga',sets:3,rMin:3,rMax:5,page:100},
+   {id:'tf_remo',base:'remo',label:'Remo con barra',kind:'carga',sets:3,rMin:3,rMax:5,page:115},
+   {id:'tf_dom',label:'Dominadas (supino)',kind:'reps',sets:3,reps:'4-6',lvls:3,lvl:3,lastre:true,page:124,note:'Si haces más de 6, añade lastre (cinturón o mochila) — pág. 254.'},
+   {id:'tf_dips',label:'Dips (fondos en paralelas)',kind:'reps',sets:3,reps:'4-6',lastre:true,extra:true,page:128}]},
+ {id:'pf',name:'Pierna · Fuerza',tipo:'fuerza',rest:150,ex:[
+   {id:'pf_sent',base:'sentadilla',label:'Sentadilla',kind:'carga',sets:3,rMin:3,rMax:5,page:86},
+   {id:'pf_pm',base:'peso_muerto',label:'Peso muerto',kind:'carga',sets:3,rMin:3,rMax:5,page:90},
+   {id:'pf_elev',label:'Elevaciones de piernas',kind:'reps',sets:3,reps:'8-10',page:145},
+   {id:'pf_gb',base:'glute_bridge',label:'Levantamiento de cadera con barra',kind:'carga',sets:3,rMin:3,rMax:5,page:110},
+   {id:'pf_unap',label:'Sentadilla a una pierna (sin peso)',kind:'reps',sets:2,reps:'5',perSide:true,extra:true,page:141,note:'Si no puedes ni asistida: sentadilla normal 2×15-20 bajando todo lo que puedas.'}]},
+ {id:'th',name:'Torso · Hipertrofia',tipo:'hiper',rest:90,ex:[
+   {id:'th_mil',base:'militar',label:'Press militar',kind:'carga',sets:4,rMin:8,rMax:10,page:100},
+   {id:'th_banca',base:'banca',label:'Press banca',kind:'carga',sets:4,rMin:8,rMax:10,page:95,note:'Si tu banco es regulable, inclínalo en las 2 últimas series.'},
+   {id:'th_dom',label:'Dominadas (prono) al fallo',kind:'reps',sets:3,reps:'F',lvls:3,lvl:3,page:124},
+   {id:'th_flexv',label:'Flexión vertical',kind:'reps',sets:4,reps:'8-10',lvls:3,lvl:2,page:122,note:'Nivel que te deje en 8-10.'},
+   {id:'th_flex',label:'Flexión al fallo',kind:'reps',sets:2,reps:'F',lvls:3,lvl:3,extra:true,page:121,note:'Nivel que te deje hacer al menos 8.'}]},
+ {id:'ph',name:'Pierna · Hipertrofia',tipo:'hiper',rest:90,ex:[
+   {id:'ph_ht',base:'hip_thrust',label:'Hip thrust',kind:'carga',sets:4,rMin:8,rMax:10,page:108},
+   {id:'ph_front',base:'sent_frontal',label:'Sentadilla frontal',kind:'carga',sets:4,rMin:8,rMax:10,page:112},
+   {id:'ph_rum',base:'rumano',label:'Peso muerto rumano',kind:'carga',sets:4,rMin:8,rMax:10,page:117},
+   {id:'ph_desp',base:'desplantes',label:'Desplantes con barra',kind:'carga',sets:4,rMin:8,rMax:10,page:114,note:'Las repeticiones cuentan en total: 10 = 5 por pierna (pág. 254).'},
+   {id:'ph_bulg',label:'Sentadilla búlgara',kind:'reps',sets:2,reps:'8-10',perSide:true,extra:true,page:140}]},
+ {id:'po',name:'Potencia + HIIT/LISS',tipo:'potencia',rest:120,cardio:true,ex:[
+   {id:'po_box',label:'Box jumps',kind:'reps',sets:3,reps:'10',note:'Saltos a plataforma. Descansa 2 min.'},
+   {id:'po_clean',base:'clean',label:'Clean',kind:'carga',sets:3,rMin:3,rMax:3,page:102,note:'Máxima velocidad. Descansa 2 min.'}]}
+];
+const BASE_LABEL={sentadilla:'Sentadilla',banca:'Press banca',peso_muerto:'Peso muerto',militar:'Press militar',glute_bridge:'Lev. cadera con barra',
+  hip_thrust:'Hip thrust',clean:'Clean',remo:'Remo con barra',sent_frontal:'Sentadilla frontal',rumano:'Peso muerto rumano',desplantes:'Desplantes'};
+
+/* Fase IV · Ajuste final por biotipo (pág. 265-270) */
+const C=(id,base,sets,rMin,rMax,extra={})=>({id,base,label:BASE_LABEL[base],kind:'carga',sets,rMin,rMax,page:(LIFTS[base]||{}).page,...extra});
+const PLANK3={id:'f4_plank',label:'Plancha abdominal',kind:'time',sets:3,secs:120,page:144,note:'Si no llegas a 2 min seguidos, descansa 5-10 s y continúa hasta completarlos.'};
+const VAC={id:'f4_vac',label:'Vómito de gato',kind:'check',sets:10,note:'10 × 8-12 s. Cuadrupedia, exhala todo y lleva el ombligo a la columna; transverso a tope (pág. 266).'};
+const FLEX3={id:'f4_flex',label:'Flexión al fallo',kind:'reps',sets:3,reps:'F',lvls:3,lvl:3,page:121,note:'Nivel que te deje al menos 8-10.'};
+const DOM4={id:'f4_dom',label:'Dominadas al fallo',kind:'reps',sets:4,reps:'F',lvls:3,lvl:2,page:124,note:'Nivel que te deje al menos 6-8; alterna agarre en cada serie.'};
+const FLEXV3={id:'f4_flexv',label:'Flexión vertical al fallo',kind:'reps',sets:3,reps:'F',lvls:3,lvl:2,page:122,note:'Nivel que te deje al menos 6-8.'};
+const DIPS3={id:'f4_dips',label:'Dips al fallo',kind:'reps',sets:3,reps:'F',page:128};
+const F4={
+ manzana:{A:[C('f4_pm3','peso_muerto',3,3,5),C('f4_banca3','banca',3,3,5),C('f4_mil3','militar',3,3,5),PLANK3,VAC],
+          B:[C('f4_sent3','sentadilla',3,3,5),C('f4_remo3','remo',3,3,5),C('f4_ht3','hip_thrust',3,3,5),
+             {id:'f4_plankL',label:'Plancha lateral',kind:'time',sets:3,secs:60,perSide:true,page:144,note:'Si no llegas a 1 min, descansa 5-10 s y completa.'},VAC]},
+ pera:{A:[C('f4_pm3','peso_muerto',3,3,5),C('f4_banca8','banca',3,8,10),C('f4_mil8','militar',3,8,10),FLEX3,DOM4],
+       B:[C('f4_sent3','sentadilla',3,3,5),C('f4_remo8','remo',3,8,10),C('f4_clean3','clean',3,3,5),FLEXV3,DIPS3]},
+ esparrago:{A:[C('f4_pm8','peso_muerto',3,8,10),C('f4_banca8','banca',3,8,10),C('f4_mil8','militar',3,8,10),FLEX3,DOM4],
+            B:[C('f4_sent8','sentadilla',3,8,10),C('f4_rum8','rumano',3,8,10),C('f4_ht8','hip_thrust',3,8,10),FLEXV3,DIPS3]}
+};
+const BIO={
+ manzana:{n:'Manzana',ico:'🍎',cardio:20,tips:['Prioridad: perder grasa abdominal (también por salud: sensibilidad a la insulina).','Nada de abdominales de aislamiento “para quemar”: fortalece el transverso (plancha + vómito de gato).','El cortisol acumula grasa abdominal: duerme bien y gestiona el estrés.','Carbohidrato en la parte baja del rango; algo más de grasa.']},
+ pera:{n:'Pera',ico:'🍐',cardio:15,tips:['Más énfasis en el cuerpo superior en hipertrofia (8-12); cuerpo inferior pesado y con pocas reps (3-5): densidad sin volumen.','La grasa de glúteos/muslos tiene poco riego: HIIT + cardio en ayunas la moviliza y la oxida.','Pre-entreno en ayunas: cafeína + BCAA.','En volumen no subas mucho la grasa dietética.']},
+ esparrago:{n:'Espárrago',ico:'🌿',cardio:10,tips:['Objetivo: acercar cintura/cadera a 0,7 aumentando cadera (glúteo en rango de hipertrofia).','Cuerpo superior también en hipertrofia para destacar la cintura.','Limita el cardio: en exceso frena el músculo que necesitas para tus curvas.']}
+};
+const F4_SEQ=[['A','B','A','COM1'],['B','A','B','G1'],['A','B','A','COM2'],['B','A','B','G2']].flat();
+
+/* Sesiones HIIT/LISS/complejos */
+const CARDIO={
+ 'f1-H1':{tag:'HIIT 1 · Tabata',tipo:'hiit',modo:'tabata',page:218,desc:'Tabata de burpees · 2 min · Tabata de sentadillas',
+   items:['Tabata de burpees: 8 × (20 s trabajo / 10 s descanso)','Descanso 2 min','Tabata de sentadillas: 8 × (20 s / 10 s)'],nota:'Usa el cronómetro guiado. Apunta las repeticiones totales de cada Tabata.'},
+ 'f1-H2':{tag:'HIIT 2',tipo:'hiit',modo:'tiempo',page:218,desc:'4 rondas · al menor tiempo posible',
+   items:['10 desplantes laterales (5 por lado)','20 swings de kettlebell (o 10 burpees)','10 flexiones (de rodillas si hace falta)','20 sentadillas'],nota:'Sin descansos programados: descansa solo lo justo. Tu marca es el TIEMPO.'},
+ 'f1-LISS':{tag:'LISS · Cardio suave',tipo:'liss',modo:'liss',page:218,desc:'30-45 min al 60-70% · puedes hablar',items:['Carrera ligera, bici, elíptica, remo…'],nota:'Apunta distancia y tiempo.',min:[30,45]},
+ 'f1-COMBO':{tag:'COMBO HIIT + LISS',tipo:'combo',modo:'combo',page:219,desc:'HIIT 1 (Tabatas) · 2 min · cardio 30-40 min',
+   items:['Tabata de burpees + 2 min + Tabata de sentadillas','Descansa un par de minutos','Cardio suave 30-40 min'],nota:'El HIIT moviliza la grasa (catecolaminas); el cardio posterior ayuda a oxidarla.'},
+ 'f2-H1':{tag:'HIIT 1',tipo:'hiit',modo:'tiempo',page:238,desc:'3 rondas · al menor tiempo posible',
+   items:['8 dominadas (nivel que puedas)','20 flexiones','30 sentadillas','30 marcha de glúteos (15 por pierna)','50 saltos de cuerda (o 10 burpees)'],nota:'Si no salen seguidas, divídelas en las menos tandas posibles. Tu marca es el TIEMPO.'},
+ 'f2-H2':{tag:'HIIT 2',tipo:'hiit',modo:'reps',page:239,rondas:5,ejercicios:[{id:'sent',lab:'Sentadilla'},{id:'flex',lab:'Flexiones'},{id:'burp',lab:'Burpees'}],desc:'5 rondas × 4 min · 20 min fijos',
+   items:['Sentadilla — 1 min','Flexiones — 1 min','Burpees — 1 min','Descanso — 1 min'],nota:'Tiempo fijo: tu marca son las REPETICIONES. Usa el cronómetro guiado.'},
+ 'f2-H3':{tag:'HIIT 3 · Kettlebell',tipo:'hiit',modo:'tiempo',kb:true,page:239,desc:'3 rondas · 1 min de descanso entre rondas',
+   items:['10 thrusters (5 por lado)','15 swings','20 flexiones','30 sentadillas (sin peso)','10 burpees','10 snatches (5 por lado)'],nota:'Tu marca es el TIEMPO total.'},
+ 'f2-H4':{tag:'HIIT 4 · Kettlebell',tipo:'hiit',modo:'tiempo',kb:true,page:240,desc:'3 rondas · 1 min de descanso entre rondas',
+   items:['5 snatches por lado','5 thrusters por lado','10 flexiones','5 high pulls por lado','10 dominadas','5 squats en rack por lado','5 swings a una mano por lado','10 burpees','5 clean & press por lado'],nota:'Tu marca es el TIEMPO total.'},
+ 'f2-LISS':{tag:'LISS · Cardio suave',tipo:'liss',modo:'liss',page:155,desc:'30-40 min al 60-70% FC máx',items:['Correr, remar, bici, elíptica…'],nota:'Debe costar algo, pero permitiéndote conversar.',min:[30,40]},
+ 'f3-H1':{tag:'HIIT 1',tipo:'hiit',modo:'tiempo',page:255,rondas:2,desc:'2 rondas · al menor tiempo',
+   items:['100 saltos de cuerda (o 100 zancadas en el sitio)','30 marcha de glúteos (15 por pierna)','1 min plancha abdominal','5 dominadas (nivel más alto posible)','10 flexiones (nivel más alto posible)'],nota:'Registra el tiempo.'},
+ 'f3-H2':{tag:'HIIT 2',tipo:'hiit',modo:'tiempo',page:255,rondas:3,desc:'3 rondas · al menor tiempo',
+   items:['40 desplantes (20 por pierna)','10 flexiones (nivel más alto posible)','30 elevación de pierna cuadrúpeda (15 por lado)','10 burpees'],nota:'Registra el tiempo.'},
+ 'f3-H3':{tag:'HIIT 3 · Kettlebell',tipo:'hiit',modo:'tiempo',kb:true,page:256,desc:'4 rondas · 1 min descanso',
+   items:['10 swings','10 squat goblet','5 dominadas (alterna agarre)','100 saltos de cuerda','5 clean & press por lado','10 flexiones'],nota:'Registra el tiempo.'},
+ 'f3-H4':{tag:'HIIT 4 · Kettlebell',tipo:'hiit',modo:'tiempo',kb:true,page:256,desc:'15-9-6 repeticiones',
+   items:['Thruster','Flexión','Swing','Burpee'],nota:'15 de cada, luego 9, luego 6. Con una sola kettlebell: thrusters por lado antes de las flexiones.'},
+ 'f3-LISS':{tag:'LISS · Cardio suave',tipo:'liss',modo:'liss',page:155,desc:'30-40 min al 60-70% FC máx',items:['Correr, remar, bici, elíptica…'],nota:'Registra el tiempo.',min:[30,40]},
+ 'f4-COM1':{tag:'Complejo 1',tipo:'complejo',modo:'complejo',page:271,desc:'4 rondas · 2 min descanso · sin soltar la barra',
+   items:['5 remos','5 cleans','5 sentadillas frontales','5 push press','5 sentadillas (trasera)'],nota:'Peso: 65-70% del 1RM de tu movimiento más débil (push press). Con barra vacía también funciona. Hoy toca RECARGA.'},
+ 'f4-COM2':{tag:'Complejo 2',tipo:'complejo',modo:'complejo',page:271,desc:'4 rondas · 2 min descanso · sin soltar la barra',
+   items:['6 pesos muertos rumanos','6 remos','6 cleans','6 push press','6 desplantes (3 por pierna)'],nota:'Peso: 65-70% del 1RM del push press. Hoy toca RECARGA.'},
+ 'f4-G1':{tag:'Guerrera 1',tipo:'guerrera',modo:'guerrera',page:272,desc:'Complejo 1 + cardio + HIIT calistenia (40-50 min)',
+   items:['Complejo 1 (4 rondas)','Descanso 3-5 min','Cardio suave 60-70% (según biotipo)','Descanso 3-5 min','HIIT 4 rondas: 10 sentadillas · 10 flexiones · 10 desplantes (5 por pierna)'],nota:'No cambies el orden: complejo fresca, corporales al final. Hoy toca RECARGA.'},
+ 'f4-G2':{tag:'Guerrera 2',tipo:'guerrera',modo:'guerrera',page:273,desc:'Complejo 2 + cardio + HIIT calistenia (40-50 min)',
+   items:['Complejo 2 (4 rondas)','Descanso 3-5 min','Cardio suave 60-70% (según biotipo)','Descanso 3-5 min','HIIT 3 rondas: 10 burpees · 10 sentadillas · 8 dips · 10 levantamientos de piernas'],nota:'Entrena como una guerrera: busca el segundo aliento. Hoy toca RECARGA.'}
+};
+// Rotación semanal por fase
+function f2CardioKey(w){ const kb=S.cfg.kettlebell; const odd=w%2===1; if(!odd) return 'f2-LISS';
+  const n=((w+1)/2-1)%4+1; return kb?`f2-H${n}`:`f2-H${(n-1)%2+1}`; }
+function f3CardioKey(w){ if(w%2===0) return {key:'f3-LISS'};
+  const n=((w+1)/2-1)%4+1; if(S.cfg.kettlebell) return {key:`f3-H${n}`};
+  const map={1:['f3-H1',2],2:['f3-H2',3],3:['f3-H1',3],4:['f3-H2',4]}; return {key:map[n][0],rondas:map[n][1]}; }
+
+/* Calentamiento general (pág. 160-162) */
+const CAL_GEN={
+  activa:'5 min de cardio ligero para subir temperatura y pulso: correr en el sitio, cuerda, remo, bici…',
+  movil:['Giros de cuello, hombros, muñecas, cadera, rodillas y tobillos.','Cadera dinámica: sentadilla profunda, balanceos de pierna, zancadas largas.','Hombros dinámica: dislocaciones, extensiones en pared, flexión escapular.','Extra según tus limitaciones (tobillos; muñecas si toca posición de rack).'],
+  despues:'Al terminar: 5-10 min de movilidad en tus zonas más rígidas; aquí sí estiramientos estáticos y rodillo.'
+};
+
+/* Alimentos (pág. 167-175) */
+const FOODS=[
+ {g:'Vegetales',ok:'Hojas verdes (espinaca, rúcula, lechuga, acelgas), brócoli, coliflor, col, espárragos, alcachofas, calabacín, champiñones, pepino, apio',
+  mod:'Vegetales con algo más de carbohidrato: zanahoria, remolacha, calabaza, cebolla, tomate, pimiento, guisantes',no:'Vegetales enlatados',nota:'Todos son recomendables; en volumen come de ambos grupos con libertad. No abuses de las conservas.'},
+ {g:'Frutas',ok:'Frutos rojos (fresas, arándanos, frambuesas), limón, pomelo, aguacate, coco',mod:'Manzana, pera, naranja, kiwi, plátano, uvas, mango, piña; fruta deshidratada en volumen',
+  no:'Fruta en lata o almíbar, mermeladas y confituras',nota:'Clasificadas por azúcar. En volumen la distinción importa poco.'},
+ {g:'Almidones',ok:'Tubérculos (patata, boniato/batata, yuca), arroz (basmati, vaporizado), plátano macho verde',
+  mod:'Avena, mijo, quinoa, trigo sarraceno, legumbres, castañas',no:'Cereales con gluten, sobre todo trigo moderno: harinas, panes, galletas, pasta',nota:'Si no puedes vivir sin pan: trigos antiguos (espelta, kamut) o sin gluten, idealmente de masa madre.'},
+ {g:'Proteína',ok:'Carnes, pescados y huevos de calidad (mejor de producción no industrial)',
+  mod:'Pescados con más mercurio, órganos y huesos (un par de veces/semana), lentejas, algas, proteína de suero (como suplemento)',no:'Carnes procesadas, embutidos industriales, proteína de soja no fermentada, gluten',nota:'Mejor gastar aquí que en vegetales ecológicos, sin obsesionarte.'},
+ {g:'Grasas',ok:'Yema de huevo, aguacate, aceitunas, leche de coco, mantequilla; para cocinar: aceite de coco, manteca, grasa de pato, ghee; AOVE en crudo o guisos',
+  mod:'Frutos secos, chocolate muy oscuro',no:'Grasas trans, aceites de semillas (girasol, canola, soja, maíz), margarina',nota:'Al menos 25-30% de tus calorías deberían ser grasa: la necesitas para tus hormonas.'},
+ {g:'Lácteos',ok:'Yogur, kéfir, quesos fermentados o de leche cruda, mantequilla, requesón/ricotta, cottage',
+  mod:'Leche entera (si la toleras; prueba la de cabra), otros quesos',no:'Leche UHT, condensada, en polvo, quesos procesados',nota:'En los menús del libro: un vaso de leche al día para batidos, avena o café.'},
+ {g:'Bebidas',ok:'Agua (con medio limón si quieres), infusiones, té verde, café',mod:'Agua de coco, leche de coco, kombucha, leche de cabra/vaca, de arroz o almendra (sin azúcar). Ocasional: leche de avena/soja, zumo natural',
+  no:'Refrescos, alcohol, bebidas deportivas y energéticas, zumos industriales',nota:'Té y café ayudan a quemar grasa, pero evítalos a partir de las 16-17 h.'}
+];
+
+/* ---------- 3) Estado ---------- */
+function freshState(){ return {v:2, cfg:structuredClone(DEFAULTS), onboarded:false, fase:2,
+  f1:{cur:1,logs:{}}, f2:{cur:1,logs:{}}, f3:{cur:1,logs:{},weights:{},started:null}, f4:{cur:1,logs:{},weights:{},started:null},
+  cardio:{}, body:{daily:{},calipers:{},perim:{},feel:{}}, ciclo:{starts:[],len:28,regla:5,anticon:false}}; }
+function load(){ try{ const r=JSON.parse(localStorage.getItem(KEY)); if(r&&r.cfg) return migrate(r); }catch(e){} return freshState(); }
+function migrate(r){ const f=freshState();
+  for(const k of Object.keys(f)) if(r[k]===undefined) r[k]=f[k];
+  for(const k of Object.keys(f.cfg)) if(r.cfg[k]===undefined) r.cfg[k]=structuredClone(f.cfg[k]);
+  for(const k of Object.keys(f.cfg.rm)) if(r.cfg.rm[k]===undefined) r.cfg.rm[k]=f.cfg.rm[k];
+  for(const k of ['daily','calipers','perim','feel']) if(!r.body[k]) r.body[k]={};
+  return r; }
+let S=load();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast('No se pudo guardar'); } }
+
+/* ---------- 4) Utilidades de fecha ---------- */
+const todayIso=()=>dateToIso(new Date());
+function isoToDate(iso){ const [y,m,d]=iso.split('-').map(Number); return new Date(y,m-1,d); }
+function dateToIso(dt){ return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`; }
+function daysBetween(a,b){ return Math.round((isoToDate(b)-isoToDate(a))/86400000); }
+function addDays(iso,n){ const d=isoToDate(iso); d.setDate(d.getDate()+n); return dateToIso(d); }
+function formatEs(iso){ return isoToDate(iso).toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'}); }
+function shortEs(iso){ return isoToDate(iso).toLocaleDateString('es-ES',{day:'numeric',month:'short'}); }
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toSec(t){ if(t==null||t==='') return 0; const s=String(t).trim(); if(s.includes(':')){ const [m,x]=s.split(':'); return (+m||0)*60+(+x||0);} return +s||0; }
+function fmtSec(s){ s=Math.round(s||0); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
+
+/* ---------- 5) Discos y carga ---------- */
+let _rc=null,_rk='';
+function reachable(){ const key=S.cfg.plates.join(','); if(_rk===key&&_rc) return _rc;
+  const step=0.25,N=Math.round(200/step)+1,r=new Array(N).fill(false); r[0]=true;
+  S.cfg.plates.filter(p=>p>0).forEach(p=>{ const pi=Math.round(p/step); if(pi>0) for(let i=pi;i<N;i++) if(r[i-pi]) r[i]=true; });
+  _rc=r;_rk=key; return r; }
+function isLoadable(w){ const bar=S.cfg.bar; if(w<bar-1e-9) return false; const per=(w-bar)/2, f=per/0.25, i=Math.round(f);
+  if(Math.abs(f-i)>1e-6) return false; const r=reachable(); return i>=0&&i<r.length&&r[i]; }
+function nearestLoadable(t){ const bar=S.cfg.bar; if(!(t>bar)) return bar;
+  for(let d=0;d<=30.0001;d+=0.25){ if(isLoadable(t-d)) return +(t-d).toFixed(2); if(isLoadable(t+d)) return +(t+d).toFixed(2); } return Math.round(t*2)/2; }
+function nextLoadableAbove(w){ for(let d=0.25;d<=30;d+=0.25) if(isLoadable(w+d)) return +(w+d).toFixed(2); return w+1; }
+function plateBreakdown(target){ const bar=S.cfg.bar; if(target<=bar) return []; let per=(target-bar)/2,out=[];
+  for(const p of [...S.cfg.plates].sort((a,b)=>b-a)){ while(per+1e-9>=p){ out.push(p); per=Math.round((per-p)*100)/100; } } return out; }
+const plateColor=p=>({25:'var(--p25)',20:'var(--p20)',15:'var(--p15)',10:'var(--p10)',5:'var(--p5)',2.5:'var(--p2)'}[p]||'var(--p1)');
+function barbellHTML(target){ const ps=plateBreakdown(target);
+  const pl=p=>`<div class="plate ${[25,20,10,2.5].includes(p)?'t':''}" style="height:${20+p*1.1}px;width:${Math.max(11,p*0.5+8)}px;background:${plateColor(p)}">${p}</div>`;
+  const txt=ps.length?`Barra ${S.cfg.bar} + ${ps.join(' + ')} por lado`:`Solo barra (${S.cfg.bar} kg)`;
+  return `<div class="barbell">${ps.map(pl).join('')}<div class="sleeve"></div><div class="sleeve" style="width:40px"></div><div class="sleeve"></div>${ps.slice().reverse().map(pl).join('')}</div><div class="platecalc-note">${txt}</div>`; }
+
+/* ---------- 6) MOTOR FASE II (progresión lineal, pág. 240-243) ---------- */
+const F2T=()=>S.cfg.f2total||24;
+const f2Week=s=>Math.ceil(s/3);
+function hipKey(s){ return ((s/2)%2===1)?'glute_bridge':'hip_thrust'; }   // B alterna: 1ª B lev. cadera con barra, 2ª hip thrust
+function sessionLifts(s){ return s%2===1?['sentadilla','banca','peso_muerto']:[hipKey(s),'militar',S.cfg.clean?'clean':'remo']; }
+const appearsIn=(k,s)=>sessionLifts(s).includes(k);
+const f2Logged=s=>!!(S.f2.logs[s]&&S.f2.logs[s].date);
+function lastF2(){ const d=Object.keys(S.f2.logs).map(Number).filter(f2Logged); return d.length?Math.max(...d):0; }
+function baseInc(k,p){ const m=p<=12?1:2; return S.cfg.inc[LIFTS[k].grp+m]; }
+function deloadsFor(k){ return (S.cfg.deloads&&S.cfg.deloads[k])||[]; }
+function startWork(k){ const rm=S.cfg.rm[k]||S.cfg.bar; return Math.max(S.cfg.bar, Math.round(rm*(1-S.cfg.descarga)/S.cfg.minInc)*S.cfg.minInc); }
+function outOf(s,k){ const l=S.f2.logs[s]; return (l&&l.out&&l.out[k])||{}; }
+function earned(k,p,inc){ const l=S.f2.logs[p]; if(l&&l.ligera) return 0; const r=outOf(p,k).r||'limpio';
+  return r==='fallo'?0:(r==='forzado'?inc/2:inc); }
+function factorAt(k,p){ let f=1; deloadsFor(k).forEach(d=>{ if(d.session<=p) f=d.factor??f; }); return f; }
+function workWeight(k,s){ if(!appearsIn(k,s)) return null; const dls=deloadsFor(k);
+  let w=startWork(k), fac=1;
+  for(let p=1;p<=s;p++){ if(!appearsIn(k,p)) continue;
+    const dl=dls.filter(d=>d.session===p).pop(); if(dl){ w=dl.weight; fac=dl.factor??fac; }
+    if(p===s) return +w.toFixed(2);
+    w+=earned(k,p,baseInc(k,p)*fac); }
+  return +w.toFixed(2); }
+function curInc(k,s){ return baseInc(k,s)*factorAt(k,s); }
+function consecutiveFails(k){ const since=Math.max(1,...deloadsFor(k).map(d=>d.session)); const apps=[];
+  for(let p=since;p<=F2T();p++) if(appearsIn(k,p)&&f2Logged(p)&&!S.f2.logs[p].ligera) apps.push(p);
+  let c=0; for(let i=apps.length-1;i>=0;i--){ if(outOf(apps[i],k).r==='fallo') c++; else break; } return c; }
+function prevAppearance(k,s){ for(let p=s-1;p>=1;p--) if(appearsIn(k,p)&&f2Logged(p)) return p; return null; }
+function nextAppearance(k){ let s=lastF2()+1; while(s<=F2T()&&!appearsIn(k,s)) s++; return s<=F2T()?s:null; }
+function sessionW(k,s){ const l=S.f2.logs[s]; const ov=l&&l.override&&l.override[k]; let W=ov!=null?ov:nearestLoadable(workWeight(k,s));
+  if(l&&l.ligera) W=nearestLoadable(W*0.6); return W; }
+/* Calentamiento por ejercicio (pág. 161): barra×5 · 40-50%×5 · 60%×3-4 · 80-85%×2.
+   Si ya calentaste el mismo grupo antes en la sesión → solo las 2 últimas. */
+function warmups(W, reduced){ const bar=S.cfg.bar;
+  let l=[{r:'1×5',w:bar,rest:30,t:'Barra'},{r:'1×5',w:nearestLoadable(Math.max(bar,W*0.45)),rest:30},{r:'1×3',w:nearestLoadable(Math.max(bar,W*0.6)),rest:60},{r:'1×2',w:nearestLoadable(Math.max(bar,W*0.82)),rest:60}];
+  l=l.filter((x,i)=>i===0||(x.w<W && x.w>l[i-1].w));
+  if(W<=bar) return [];
+  if(reduced) l=l.slice(-2);
+  return l; }
+function buildF2(s){ const isA=s%2===1; const seen=new Set();
+  const lifts=sessionLifts(s).map(k=>{ const L=LIFTS[k], W=sessionW(k,s), reduced=seen.has(L.wg); seen.add(L.wg);
+    const wu=warmups(W,reduced).map(x=>({...x,work:false}));
+    const work=Array.from({length:L.sets},()=>({r:`1×${L.reps}`,w:W,work:true}));
+    return {key:k,label:L.label,scheme:`${L.sets}×${L.reps}`,W,reduced,sets:[...wu,...work],page:L.page}; });
+  return {s,day:isA?'A':'B',lifts,acc:F2_ACC[isA?'A':'B']}; }
+function f2Log(s){ if(!S.f2.logs[s]) S.f2.logs[s]={sets:{},out:{},notes:{},acc:{},override:{}}; const l=S.f2.logs[s];
+  ['sets','out','notes','acc','override'].forEach(k=>{ if(!l[k]) l[k]={}; }); return l; }
+
+/* ---------- 7) Estimaciones de 1RM y siembra de pesos (fases III y IV) ---------- */
+const DP_SPECS={}; F3_DAYS.forEach(d=>d.ex.forEach(e=>{ if(e.kind==='carga') DP_SPECS[e.id]=e; }));
+Object.values(F4).forEach(b=>['A','B'].forEach(x=>b[x].forEach(e=>{ if(e.kind==='carga') DP_SPECS[e.id]=e; })));
+function est1RM(base){
+  for(const ph of ['f4','f3']){ const W=S[ph].weights; let best=null;
+    Object.keys(W).forEach(id=>{ const sp=DP_SPECS[id]; if(sp&&sp.base===base&&W[id]>0){ const v=W[id]*EP(sp.rMin); if(!best||v>best) best=v; } });
+    if(best) return best; }
+  if(LIFTS[base]){ const s=nextAppearance(base)||F2T(); let w=null;
+    for(let p=Math.min(s,F2T());p>=1;p--) if(appearsIn(base,p)){ w=workWeight(base,p); break; }
+    if(w) return w*EP(LIFTS[base].reps); }
+  const der={sent_frontal:['sentadilla',0.8],rumano:['peso_muerto',0.7],desplantes:['sentadilla',0.45],remo:['banca',0.9],hip_thrust:['glute_bridge',0.9],glute_bridge:['hip_thrust',1.1]}[base];
+  if(der){ const b=est1RM(der[0]); if(b) return b*der[1]; }
+  return null; }
+function seedWeight(base,rMin){ const o=est1RM(base); return o?nearestLoadable(o/EP(rMin)):S.cfg.bar; }
+function best1RMFromLog(w,sets){ const r=Math.max(0,...(sets||[]).map(x=>+x||0)); return r>0&&w>0?w*EP(r):null; }
+
+/* ---------- 8) CICLO MENSTRUAL (pág. 41-45, 204-207) ---------- */
+function cicloLen(){ const st=[...S.ciclo.starts].sort(); const d=[];
+  for(let i=1;i<st.length;i++){ const x=daysBetween(st[i-1],st[i]); if(x>=21&&x<=40) d.push(x); }
+  const r=d.slice(-6); return r.length?Math.round(r.reduce((a,b)=>a+b,0)/r.length):(+S.ciclo.len||28); }
+function cicloInfo(iso=todayIso()){ const c=S.ciclo; if(c.anticon) return {anticon:true};
+  const last=[...c.starts].filter(d=>d<=iso).sort().pop(); if(!last) return null;
+  const len=cicloLen(), day=daysBetween(last,iso)+1, ovu=len-14, regla=+c.regla||5;
+  let fase; if(day<=regla) fase='menstrual'; else if(day<ovu-1) fase='folicular'; else if(day<=ovu+1) fase='ovulatoria'; else fase='lutea';
+  return {day,len,ovu,regla,fase,late:day>len,finLutea:fase==='lutea'&&day>=len-4,last,next:addDays(last,len)}; }
+const CICLO_TXT={
+ menstrual:{n:'Menstruación',pref:'liss',
+   ent:['Mantente activa, pero baja la intensidad si lo necesitas (menos hemoglobina = menos oxígeno al músculo).','Si te notas sin fuerza, marca la sesión como LIGERA: mismas series al 60% (pág. 243).'],
+   com:['Si tienes antojos, fruta o un par de onzas de chocolate >85%.']},
+ folicular:{n:'Fase folicular',pref:'hiit',
+   ent:['Tu mejor momento para progresar en fuerza.','Prioriza HIIT: el cuerpo usa mejor el glucógeno.'],
+   com:['Mejor sensibilidad a la insulina: puedes subir algo el carbohidrato.','Si estás en definición, recargas y batidos post-entreno algo mayores.']},
+ ovulatoria:{n:'Ovulación',pref:'hiit',
+   ent:['Posible pico de fuerza (sube la testosterona).','Ojo: 3-4× más lesiones de rodilla. Técnica impecable, ¡rodillas afuera!'],
+   com:['El apetito suele bajar; el metabolismo empieza a subir.']},
+ lutea:{n:'Fase lútea',pref:'liss',
+   ent:['Menos HIIT, más cardio al 60-70% (LISS); mantén la fuerza.','Quemas más grasa como combustible: aprovéchalo.'],
+   com:['Peor sensibilidad a la insulina: baja un poco el carbohidrato y minimiza recargas.','El metabolismo sube hasta un 8% y el apetito también: controla la ingesta.']},
+ finLutea:{ent:['Retención de líquidos y molestias: buen momento para una semana de descarga si lo necesitas.'],
+   com:['Antojos: comida libre puntual, fruta como snack, 2 onzas de chocolate >85%.','Fruta + algo de proteína entre comidas si te dan bajones de glucosa.','Prueba magnesio (citrato, 400 mg) o triptófano por la noche (pág. 188).']}
+};
+function cicloBannerHTML(compact){ const ci=cicloInfo();
+  if(!ci) return `<div class="cycle"><div class="cycle-top"><span class="cycle-ph" style="color:var(--muted)">🌙 Ciclo</span>
+     <button class="btn ghost sm" data-regla="1">Me ha venido hoy</button></div>
+     <p class="tiny" style="margin:6px 0 0">Registra el inicio de tu regla y la app adapta HIIT/LISS, carbohidrato y avisos a cada fase. Ajusta duración en Cuerpo › Ciclo.</p></div>`;
+  if(ci.anticon) return compact?'':`<div class="cycle"><span class="cycle-ph" style="color:var(--muted)">🌙 Ciclo</span><p class="tiny" style="margin:6px 0 0">Con anticonceptivos hormonales los ajustes por fase no aplican (pág. 45, 204).</p></div>`;
+  const T=CICLO_TXT[ci.fase]; const fin=ci.finLutea?CICLO_TXT.finLutea:null;
+  const ent=[...T.ent,...(fin?fin.ent:[])], com=[...T.com,...(fin?fin.com:[])];
+  const seg=(a,b,col)=>`<div style="width:${(b-a)/ci.len*100}%;background:${col}"></div>`;
+  const bar=`<div class="cyc-bar">${seg(0,ci.regla,'#b33a4a')}${seg(ci.regla,ci.ovu-2,'#4bae6e')}${seg(ci.ovu-2,ci.ovu+1,'#e0b020')}${seg(ci.ovu+1,ci.len,'#5aa7d8')}
+     <span class="cyc-mark" style="left:calc(${Math.min(99,(ci.day-0.5)/ci.len*100)}% - 1px)"></span></div>`;
+  return `<div class="cycle ${ci.fase} ${compact?'':'open'}" id="cycleBox">
+    <div class="cycle-top"><div><span class="cycle-ph">${T.n}</span> <span class="cycle-day">· día ${ci.day}/${ci.len}${ci.late?' (retraso)':''}</span></div>
+      <button class="btn ghost sm" data-regla="1">Me ha venido</button></div>${bar}
+    <ul>${ent.map(x=>`<li>🏋️ ${x}</li>`).join('')}${com.map(x=>`<li>🥗 ${x}</li>`).join('')}</ul>
+    <p class="tiny" style="margin:6px 0 0">Cada mujer lo vive distinto: usa esto como guía y apunta tus sensaciones en Cuerpo › Ciclo.</p></div>`; }
+function wireRegla(){ document.querySelectorAll('[data-regla]').forEach(b=>b.onclick=()=>{
+  const t=todayIso(); askConfirm(`¿Registrar hoy (${formatEs(t)}) como primer día de regla?`,()=>{
+    if(!S.ciclo.starts.includes(t)) S.ciclo.starts.push(t); S.ciclo.starts.sort(); save(); render(); toast('Ciclo actualizado'); },'Registrar'); }); }
+const cicloPref=()=>{ const c=cicloInfo(); return c&&!c.anticon?CICLO_TXT[c.fase].pref:null; };
+
+/* ---------- 9) UI común ---------- */
+let toastT;
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2000); }
+function askConfirm(msg,onYes,yesLabel='Aceptar'){ const ov=document.getElementById('modal');
+  document.getElementById('modal-msg').textContent=msg; const y=document.getElementById('modal-yes'),n=document.getElementById('modal-no');
+  y.textContent=yesLabel; ov.classList.add('show');
+  const close=()=>{ ov.classList.remove('show'); y.onclick=n.onclick=ov.onclick=null; };
+  y.onclick=()=>{ close(); onYes(); }; n.onclick=close; ov.onclick=e=>{ if(e.target===ov) close(); }; }
+function openDlg(html){ const d=document.getElementById('dlg'); document.getElementById('dlg-box').innerHTML=html; d.classList.add('show');
+  d.onclick=e=>{ if(e.target===d) closeDlg(); }; return document.getElementById('dlg-box'); }
+function closeDlg(){ document.getElementById('dlg').classList.remove('show'); }
+let restEnd=0,restInt=null;
+function startRest(sec){ restEnd=Date.now()+sec*1000; document.getElementById('rest').classList.add('show'); if(restInt) clearInterval(restInt); tickRest(); restInt=setInterval(tickRest,250); }
+function tickRest(){ const p=document.getElementById('rest'),o=document.getElementById('rest-time'),ms=restEnd-Date.now();
+  if(ms<=0){ clearInterval(restInt); restInt=null; o.textContent='¡Ya!'; beep(); if(navigator.vibrate) navigator.vibrate([300,120,300]); setTimeout(()=>p.classList.remove('show'),1400); return; }
+  o.textContent=fmtSec(Math.ceil(ms/1000)); }
+function stopRest(){ if(restInt) clearInterval(restInt); restInt=null; document.getElementById('rest').classList.remove('show'); }
+let _ac=null;
+function beep(f=880,d=.5){ try{ _ac=_ac||new (window.AudioContext||window.webkitAudioContext)(); const o=_ac.createOscillator(),g=_ac.createGain();
+  o.connect(g); g.connect(_ac.destination); o.frequency.value=f; g.gain.setValueAtTime(.3,_ac.currentTime); g.gain.exponentialRampToValueAtTime(.001,_ac.currentTime+d); o.start(); o.stop(_ac.currentTime+d); }catch(e){} }
+/* Cronómetro de intervalos guiado (Tabata, HIIT por minutos) */
+let itId=null;
+function intervalTimer(blocks,title){ if(itId){ clearInterval(itId); itId=null; document.querySelectorAll('.itimer').forEach(x=>x.remove()); }
+  let i=0,end=Date.now()+blocks[0].sec*1000;
+  const box=document.createElement('div'); box.className='itimer'; box.innerHTML=`<div class="it-lab"></div><div class="it-time"></div><button class="it-x">✕</button>`;
+  document.body.appendChild(box); beep(660,.25);
+  const close=()=>{ clearInterval(itId); itId=null; box.remove(); };
+  const paint=()=>{ const left=Math.max(0,Math.ceil((end-Date.now())/1000)), b=blocks[i];
+    box.querySelector('.it-lab').innerHTML=`${b.lab}<small>${i+1}/${blocks.length}${blocks[i+1]?' · luego: '+blocks[i+1].lab:''}</small>`;
+    box.querySelector('.it-time').textContent=fmtSec(left); box.classList.toggle('rest',!!b.rest);
+    if(left<=3&&left>0&&!b._b){ b._b={}; } if(left<=0){ beep(blocks[i+1]&&blocks[i+1].rest?520:880,.35); if(navigator.vibrate) navigator.vibrate(180);
+      i++; if(i>=blocks.length){ close(); toast((title||'Intervalos')+' completado'); return; } end=Date.now()+blocks[i].sec*1000; } };
+  box.querySelector('.it-x').onclick=close; paint(); itId=setInterval(paint,200); }
+const tabataBlocks=(name)=>{ const b=[]; for(let r=1;r<=8;r++){ b.push({lab:`${name} ${r}/8`,sec:20}); if(r<8) b.push({lab:'Descanso',sec:10,rest:true}); } return b; };
+
+/* ---- Tarjeta genérica de ejercicio corporal / tiempo / check ---- */
+function bwTarget(sp){ if(sp.kind==='time') return `${sp.sets} × ${fmtSec(sp.secs)}${sp.perSide?' por lado':''}`;
+  if(sp.kind==='check') return sp.note?sp.note.split('.')[0]:`${sp.sets} series`;
+  return `${sp.sets} × ${sp.reps==='F'?'al fallo':sp.reps}${sp.perSide?' por lado':''}`; }
+function bwScore(sp,v){ if(!v) return -1; if(sp.kind==='time'){ return (v.s||[]).reduce((a,x)=>a+toSec(x),0); }
+  return ((+v.lvl||0)*10000)+(+v.lastre||0)*100+(v.s||[]).reduce((a,x)=>a+(+x||0),0); }
+function bwText(sp,v){ if(sp.kind==='time') return (v.s||[]).map(x=>x||'—').join(' / ');
+  const lv=v.lvl?`N${v.lvl} · `:''; const la=+v.lastre?` · +${v.lastre} kg`:''; return lv+(v.s||[]).map(x=>x===''||x==null?'—':x).join('·')+la; }
+function bwCard(sp,v,onChange,best){ v=v||{}; if(!v.s) v.s=[];
+  const div=document.createElement('div'); div.className='card'+(sp.extra?'':' open');
+  const n=sp.kind==='time'&&sp.perSide?sp.sets*2:sp.sets;
+  const names=sp.lvls?lvlNames(sp.label):null; const lvl=v.lvl||sp.lvl;
+  let inputs='';
+  if(sp.kind==='check'){ inputs=`<label class="alt-toggle"><input type="checkbox" data-chk ${v.done?'checked':''}> Hecho (${sp.sets} repeticiones)</label>`; }
+  else{ inputs=`<div class="sets-grid">${Array.from({length:n},(_,i)=>{ const lab=sp.kind==='time'&&sp.perSide?`S${Math.floor(i/2)+1}${i%2?'D':'I'}`:`S${i+1}`;
+      return `<label class="sg"><span>${lab}</span><input type="${sp.kind==='time'?'text':'number'}" inputmode="${sp.kind==='time'?'text':'numeric'}" data-i="${i}" value="${esc(v.s[i]??'')}" placeholder="${sp.kind==='time'?fmtSec(sp.secs):(sp.reps==='F'?'máx':String(sp.reps).split('-').pop())}"></label>`; }).join('')}</div>`;
+    if(sp.kind==='time') inputs+=`<p class="tiny" style="margin:6px 0 0">Tiempo en m:ss o segundos${sp.perSide?' · I = izquierda, D = derecha':''}.</p>`; }
+  div.innerHTML=`<div class="card-head"><div class="left">${sp.ss?`<span class="ss-tag">${sp.ss}</span>`:''}<span class="ex-name" style="font-size:16px">${esc(sp.label)}</span>${sp.extra?'<span class="opt-badge">Extra</span>':''}</div>
+    <div style="display:flex;gap:8px;align-items:center"><span class="ex-scheme">${bwTarget(sp)}</span><span class="chev">▶</span></div></div>
+    <div class="card-body">
+      ${sp.extra?'<div class="note">Ejercicio <b>extra</b>: solo si acabas lo prescrito en menos de 45-50 min y vas con energía. Si no, directa a la movilidad (pág. 254).</div>':''}
+      ${best?`<div class="prevline">🎯 A batir: <b>${esc(best)}</b></div>`:''}
+      ${names?`<div class="lvl-row"><span class="lbl2">Nivel</span>${names.map((t,i)=>`<button class="lv ${lvl==i+1?'sel':''}" data-lv="${i+1}" title="${esc(t)}">${i+1}</button>`).join('')}<span class="tiny">${esc(names[(lvl||1)-1]||'')}</span></div>`:''}
+      ${inputs}
+      ${sp.lastre?`<div class="acc-input"><span>Lastre</span><input class="inline-num" type="number" inputmode="decimal" data-lastre value="${esc(v.lastre??'')}" placeholder="0"><span class="tiny">kg</span></div>`:''}
+      ${sp.note?`<div class="help">${esc(sp.note)}${sp.page?`<br><span class="pageref">📖 pág. ${sp.page}</span>`:''}</div>`:(sp.page?`<div class="help"><span class="pageref">📖 Técnica: pág. ${sp.page}</span></div>`:'')}
+    </div>`;
+  div.querySelector('.card-head').onclick=()=>div.classList.toggle('open');
+  const emit=()=>onChange(v);
+  div.querySelectorAll('[data-i]').forEach(inp=>inp.addEventListener('change',e=>{ v.s[+e.target.dataset.i]=e.target.value.trim(); emit(); }));
+  div.querySelectorAll('[data-lv]').forEach(b=>b.onclick=()=>{ v.lvl=+b.dataset.lv; div.querySelectorAll('[data-lv]').forEach(x=>x.classList.toggle('sel',x===b));
+    const t=div.querySelector('.lvl-row .tiny'); if(t) t.textContent=names[v.lvl-1]; emit(); });
+  const la=div.querySelector('[data-lastre]'); if(la) la.addEventListener('change',e=>{ v.lastre=e.target.value; emit(); });
+  const ck=div.querySelector('[data-chk]'); if(ck) ck.onchange=e=>{ v.done=e.target.checked; emit(); };
+  if(sp.kind!=='check'&&!sp.lvls&&v.lvl==null){} else if(sp.lvls&&v.lvl==null){ v.lvl=sp.lvl; }
+  return div; }
+/* Mejor marca previa de un ejercicio corporal en un conjunto de logs */
+function bestBW(sp,entries){ let b=null,bs=-1; entries.forEach(v=>{ const sc=bwScore(sp,v); if(sc>bs&&(v.s||[]).some(x=>x!==''&&x!=null)){ bs=sc; b=v; } }); return b?bwText(sp,b):null; }
+
+/* ---------- 10) Cardio: HIIT / LISS / complejos ---------- */
+function allCardioLogs(){ const out=[];
+  Object.entries(S.f1.logs).forEach(([n,l])=>{ if(l&&l.cardio) Object.entries(l.cardio).forEach(([k,v])=>out.push({k,v,fase:1,ref:'f1-'+n})); });
+  Object.entries(S.cardio).forEach(([wk,o])=>Object.entries(o||{}).forEach(([k,v])=>out.push({k,v,fase:+wk.split('-')[0],ref:'c-'+wk})));
+  ['f3','f4'].forEach(ph=>Object.entries(S[ph].logs).forEach(([n,l])=>{ if(l&&l.cardio) Object.entries(l.cardio).forEach(([k,v])=>out.push({k,v,fase:+ph[1],ref:ph+'-'+n})); }));
+  return out.filter(x=>x.v&&x.v.done); }
+function cardioSummary(key,l){ const d=CARDIO[key]; if(!l) return ''; const p=[];
+  if(l.alt&&(l.alt.tipo||l.alt.min)){ if(l.alt.tipo)p.push(l.alt.tipo); if(l.alt.min)p.push(l.alt.min+' min'); if(l.alt.km)p.push(l.alt.km+' km'); return p.join(' · '); }
+  if(d.modo==='reps'&&l.reps){ return d.ejercicios.map(e=>{ let s=0; for(let r=0;r<d.rondas;r++) s+=(+l.reps[e.id+r]||0); return `${e.lab} ${s}`; }).join(' · '); }
+  if(l.tab1||l.tab2) p.push(`Tabatas ${l.tab1||'—'} / ${l.tab2||'—'} reps`);
+  if(l.kg) p.push(l.kg+' kg'); if(l.res) p.push(l.res); if(l.min) p.push(l.min+' min'); if(l.km) p.push(l.km+' km'); if(l.fc) p.push(l.fc+' lpm');
+  return p.join(' · '); }
+function prevCardio(key,excludeRef){ const l=allCardioLogs().filter(x=>x.k===key&&x.ref!==excludeRef&&x.v.date).sort((a,b)=>b.v.date.localeCompare(a.v.date))[0]; return l?l.v:null; }
+function edad(){ return +(S.cfg.nutri.edad)||null; }
+function fcObjetivo(){ const e=edad(); if(!e) return null; const max=Math.round(208-0.7*e); return [Math.round(max*0.6),Math.round(max*0.7),max]; }
+function complexKg(){ const m=est1RM('militar'); if(!m) return null; return nearestLoadable(m*1.25*0.675); } // push press ≈ militar +20-30% (pág. 119)
+function cardioCard(key,log,opts={}){ const d=CARDIO[key]; const onSave=opts.onSave||(()=>save());
+  const rondas=opts.rondas||d.rondas; log.tag=d.tag;
+  const div=document.createElement('div'); div.className='card open';
+  const prev=prevCardio(key,opts.ref); const fc=fcObjetivo();
+  let reg='';
+  if(d.modo==='tiempo') reg=`<div class="acc-input"><span>Tiempo total</span><input type="text" data-f="res" value="${esc(log.res||'')}" placeholder="mm:ss" style="width:110px"></div>`;
+  if(d.modo==='reps'){ reg=`<p class="eyebrow" style="margin-top:8px">Repeticiones por ronda</p>
+     <div class="hiit-grid" style="grid-template-columns:auto repeat(${d.ejercicios.length},1fr)"><div></div>${d.ejercicios.map(e=>`<div class="hg-h">${e.lab}</div>`).join('')}
+     ${Array.from({length:d.rondas},(_,r)=>`<div class="hg-r">R${r+1}</div>${d.ejercicios.map(e=>`<input class="hg-i" type="number" inputmode="numeric" data-rep="${e.id}${r}" value="${esc((log.reps||{})[e.id+r]??'')}" placeholder="—">`).join('')}`).join('')}
+     <div class="hg-r">Σ</div>${d.ejercicios.map(e=>`<div class="hg-t" data-tot="${e.id}">0</div>`).join('')}</div>
+     <button class="btn ghost sm" data-timer style="margin-top:10px">▶ Cronómetro 20 min</button>`; }
+  if(d.modo==='tabata'||d.modo==='combo'){ reg=`<div class="grid2" style="margin-top:6px"><div class="field"><label>Reps Tabata burpees</label><input type="number" inputmode="numeric" data-f="tab1" value="${esc(log.tab1||'')}"></div>
+     <div class="field"><label>Reps Tabata sentadillas</label><input type="number" inputmode="numeric" data-f="tab2" value="${esc(log.tab2||'')}"></div></div>
+     <button class="btn ghost sm" data-timer>▶ Cronómetro Tabata</button>`; }
+  if(d.modo==='liss'||d.modo==='combo'){ reg+=`<div class="grid2" style="margin-top:10px"><div class="field"><label>Minutos</label><input type="number" inputmode="numeric" data-f="min" value="${esc(log.min||'')}" placeholder="${d.min?d.min.join('-'):'30-40'}"></div>
+     <div class="field"><label>Distancia (km)</label><input type="number" inputmode="decimal" data-f="km" value="${esc(log.km||'')}"></div></div>
+     <div class="grid2"><div class="field"><label>Actividad</label><input type="text" data-f="act" value="${esc(log.act||'')}" placeholder="Correr, bici…"></div>
+     <div class="field"><label>FC media (lpm)</label><input type="number" inputmode="numeric" data-f="fc" value="${esc(log.fc||'')}"></div></div>
+     ${fc?`<div class="note">Zona objetivo 60-70%: <b>${fc[0]}-${fc[1]} lpm</b> (FC máx estimada ${fc[2]}, fórmula de Tanaka; es una estimación).</div>`:'<p class="tiny">Pon tu edad en Dieta para ver tu zona de pulsaciones.</p>'}`; }
+  if(d.modo==='complejo'||d.modo==='guerrera'){ const kg=complexKg();
+    reg=`<div class="grid2" style="margin-top:6px"><div class="field"><label>Peso barra (kg)</label><input type="number" inputmode="decimal" data-f="kg" value="${esc(log.kg||'')}" placeholder="${kg||S.cfg.bar}"></div>
+     <div class="field"><label>Tiempo total</label><input type="text" data-f="res" value="${esc(log.res||'')}" placeholder="mm:ss"></div></div>
+     ${kg?`<p class="tiny">Sugerido: ~${kg} kg (65-70% del 1RM estimado de push press). Si cuesta, barra vacía.</p>`:''}`;
+    if(d.modo==='guerrera'){ const b=BIO[S.cfg.biotipo]; reg+=`<div class="field"><label>Cardio suave (min)</label><input type="number" inputmode="numeric" data-f="min" value="${esc(log.min||'')}" placeholder="${b?b.cardio:'10-20'}"></div>
+       <p class="tiny">Manzana 20 min · Pera 15 · Espárrago 10 (pág. 272).</p>`; } }
+  const showAlt=['hiit','liss','combo'].includes(d.tipo);
+  div.innerHTML=`<div class="card-head"><div class="left"><span class="ex-name" style="font-size:17px">${esc(d.tag)}</span></div><span class="ex-scheme">${log.done?'✓ hecho':esc(d.desc.split('·')[0])}</span></div>
+    <div class="card-body">
+      <p class="tiny" style="color:var(--warm);margin-top:2px">${esc(d.desc)}${opts.rondas?` · <b>${rondas} rondas</b> (sin kettlebell, pág. 255)`:''}</p>
+      ${prev?`<div class="prevline">🎯 Última vez (${shortEs(prev.date)}): <b>${esc(cardioSummary(key,prev))}</b></div>`:''}
+      <ul style="margin:6px 0 8px;padding-left:18px;font-size:14px;line-height:1.7">${d.items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+      <div class="note" style="font-size:12.5px">${esc(d.nota)} <span class="pageref">📖 pág. ${d.page}</span></div>
+      <div data-reg class="${log.alt?'hidden':''}">${reg}</div>
+      ${showAlt?`<label class="alt-toggle"><input type="checkbox" data-alttog ${log.alt?'checked':''}> Sustituir por otra actividad (ruta, bici, nadar…)</label>
+      <div data-altf class="${log.alt?'':'hidden'}"><div class="grid2" style="margin-top:8px"><div class="field"><label>Actividad</label><input type="text" data-a="tipo" value="${esc((log.alt||{}).tipo||'')}"></div>
+        <div class="field"><label>Minutos</label><input type="number" data-a="min" value="${esc((log.alt||{}).min||'')}"></div></div>
+        <div class="field"><label>Km / notas</label><input type="text" data-a="km" value="${esc((log.alt||{}).km||'')}"></div></div>`:''}
+      <div class="acc-input" style="margin-top:6px"><span>Fecha</span><input type="date" data-f="date" value="${esc(log.date||todayIso())}" style="width:auto"></div>
+    </div>`;
+  div.querySelector('.card-head').onclick=()=>div.classList.toggle('open');
+  div.querySelectorAll('[data-f]').forEach(i=>i.addEventListener('change',e=>{ log[e.target.dataset.f]=e.target.value; onSave(); }));
+  const tot=()=>{ if(d.modo!=='reps') return; d.ejercicios.forEach(e=>{ let s=0; for(let r=0;r<d.rondas;r++) s+=(+(log.reps||{})[e.id+r]||0); div.querySelector(`[data-tot="${e.id}"]`).textContent=s; }); };
+  div.querySelectorAll('[data-rep]').forEach(i=>i.addEventListener('input',()=>{ log.reps=log.reps||{}; const v=i.value.trim(); if(v==='') delete log.reps[i.dataset.rep]; else log.reps[i.dataset.rep]=+v; onSave(); tot(); }));
+  tot();
+  const tb=div.querySelector('[data-timer]'); if(tb) tb.onclick=()=>{
+    if(d.modo==='reps'){ const b=[]; for(let r=1;r<=d.rondas;r++){ d.ejercicios.forEach(e=>b.push({lab:`R${r} · ${e.lab}`,sec:60})); b.push({lab:`R${r} · Descanso`,sec:60,rest:true}); } intervalTimer(b,d.tag); }
+    else intervalTimer([...tabataBlocks('Burpees'),{lab:'Descanso',sec:120,rest:true},...tabataBlocks('Sentadillas')],'Tabatas'); };
+  const at=div.querySelector('[data-alttog]'); if(at){ at.onchange=()=>{ if(at.checked){ log.alt=log.alt||{}; } else delete log.alt;
+      div.querySelector('[data-altf]').classList.toggle('hidden',!at.checked); div.querySelector('[data-reg]').classList.toggle('hidden',at.checked); onSave(); };
+    div.querySelectorAll('[data-a]').forEach(i=>i.addEventListener('change',e=>{ log.alt=log.alt||{}; log.alt[e.target.dataset.a]=e.target.value; onSave(); })); }
+  return div; }
+
+/* ====================================================================
+   11) VISTAS
+   ==================================================================== */
+let view='hoy';
+const app=document.getElementById('app'), pill=document.getElementById('pill');
+const FASE_N={1:'I · Fundamentos',2:'II · Fuerza',3:'III · Hipertrofia',4:'IV · Ajuste final'};
+function render(){
+  pill.textContent=!S.onboarded?'Bienvenida':pillText();
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  if(!S.onboarded){ renderOnboarding(); return; }
+  ({hoy:renderHoy,plan:renderPlan,historial:renderHistorial,progreso:renderProgreso,cuerpo:renderCuerpo,dieta:renderDieta,ajustes:renderAjustes}[view]||renderHoy)();
+  wireRegla(); }
+function pillText(){ const f=S.fase;
+  if(f===1){ const it=f1Seq()[S.f1.cur-1]; return it?`Fase I · Sem ${it.w} · ${it.t==='C'?'Cardio':'Sesión '+it.t+it.code}`:'Fase I · completada'; }
+  if(f===2) return `Fase II · Sem ${f2Week(S.f2.cur)} · S${S.f2.cur}/${F2T()} · ${S.f2.cur%2?'A':'B'}`;
+  if(f===3) return `Fase III · Sem ${Math.ceil(S.f3.cur/5)} · Día ${(S.f3.cur-1)%5+1}/5`;
+  return `Fase IV · Sem ${Math.min(4,Math.ceil(S.f4.cur/4))} · ${Math.min(S.f4.cur,16)}/16`; }
+function faseSwitchHTML(){ return `<div class="seg" id="faseSw">${[1,2,3,4].map(n=>`<button data-fase="${n}" class="${S.fase===n?'sel':''}">Fase ${['I','II','III','IV'][n-1]}</button>`).join('')}</div>`; }
+function wireFaseSw(){ document.querySelectorAll('#faseSw [data-fase]').forEach(b=>b.onclick=()=>setFase(+b.dataset.fase)); }
+function warmGenHTML(open){ return `<div class="card warmup-card ${open?'open':''}"><div class="card-head"><div class="left"><span class="ex-name" style="font-size:16px">🔥 Calentamiento general</span></div><span class="ex-scheme">10 min</span><span class="chev">▶</span></div>
+  <div class="card-body"><b class="wu-t">1 · Activación (5 min)</b><p class="tiny" style="color:var(--muted);margin:0 0 8px">${CAL_GEN.activa}</p>
+  <b class="wu-t">2 · Movilidad dinámica (5-10 min)</b><ul class="wu-list">${CAL_GEN.movil.map(x=>`<li>${x}</li>`).join('')}</ul>
+  <p class="tiny" style="margin-top:8px">${CAL_GEN.despues} 📖 pág. 160-162</p></div></div>`; }
+function wireCards(){ document.querySelectorAll('.warmup-card .card-head').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('open')); }
+function renderHoy(){ ({1:renderHoyF1,2:renderHoyF2,3:()=>renderHoyDP(P3),4:()=>renderHoyDP(P4)}[S.fase])(); }
+
+/* ---------- FASE I ---------- */
+function f1Seq(){ const out=[];
+  if(S.cfg.f1modo==='4d'){ const T=[['A1','B1','A1','H1'],['B1','A2','B2','LISS'],['A2','B2','A3','H2'],['B3','A3','B3','LISS'],['A4','B4','A4','COMBO'],['B4']];
+    T.forEach((row,i)=>row.forEach(c=>out.push(/^[AB]\d$/.test(c)?{t:c[0],code:+c[1],w:i+1}:{t:'C',c:c,w:i+1}))); }
+  else { const cs=['H1','LISS','H2','COMBO']; for(let w=1;w<=4;w++){ ['A','B','A','B'].forEach(t=>out.push({t,code:w,w})); out.push({t:'C',c:cs[w-1],w}); } }
+  return out; }
+function f1Entries(t,code,exId,before){ const out=[]; Object.entries(S.f1.logs).forEach(([n,l])=>{ if(+n<before&&l.date&&l.ex&&l.ex[exId]) out.push(l.ex[exId]); }); return out; }
+function renderHoyF1(){ const seq=f1Seq(); if(S.f1.cur>seq.length){ app.innerHTML=`${faseSwitchHTML()}<div class="note ok">🎉 <b>Fase I completada.</b> Has interiorizado los patrones (hip thrust y variantes incluidos). Toca coger la barra: pasa a la <b>Fase II · Fuerza</b>.</div>
+    <button class="btn" id="goF2">Empezar Fase II →</button><button class="btn ghost" id="backF1" style="margin-top:8px">‹ Volver a la última sesión</button>`;
+    wireFaseSw(); document.getElementById('goF2').onclick=()=>setFase(2); document.getElementById('backF1').onclick=()=>{ S.f1.cur=seq.length; save(); render(); }; return; }
+  const it=seq[S.f1.cur-1], n=S.f1.cur; const log=S.f1.logs[n]||(S.f1.logs[n]={ex:{},cardio:{}}); if(!log.ex) log.ex={}; if(!log.cardio) log.cardio={};
+  let html=`${faseSwitchHTML()}${cicloBannerHTML(true)}<p class="eyebrow">Fase I · Semana ${it.w} · ${n}/${seq.length}</p>`;
+  if(it.t!=='C'){ html+=`<h2 class="h-big">Sesión ${it.t}${it.code} · ${it.t==='A'?'Cadera y piernas':'Torso y core'}</h2>
+     <p class="sub">Supersets: los ejercicios con la misma letra (A1-A2) van seguidos sin descanso. 1 min entre supersets. Sube o baja de nivel según llegues a las repeticiones.</p>
+     <div class="card warmup-card"><div class="card-head"><div class="left"><span class="ex-name" style="font-size:16px">🔥 Calentamiento</span></div><span class="chev">▶</span></div>
+     <div class="card-body"><ul class="wu-list"><li>3-5 min de cardio: cuerda, correr en el sitio…</li><li>Giros de cuello, hombros, muñecas, cadera, rodillas y tobillos.</li></ul><p class="tiny">📖 pág. 212</p></div></div>
+     <div id="exs"></div>`; }
+  else html+=`<h2 class="h-big">Sesión quema-grasa</h2><p class="sub">Según tu ciclo: HIIT antes de la ovulación, LISS después (pág. 211). Por calendario toca <b>${CARDIO['f1-'+it.c].tag}</b>.</p>
+     <div class="ntabs" id="cpick">${['H1','H2','LISS','COMBO'].map(c=>`<button data-c="${c}" class="${(log.pick||it.c)===c?'sel':''}">${CARDIO['f1-'+c].tag.split(' ·')[0]}</button>`).join('')}</div><div id="exs"></div>`;
+  html+=`<div class="btn-row"><button class="btn ghost" id="prev">‹ Anterior</button><button class="btn" id="done">${log.date?'✓ Guardada · siguiente':'Completar ›'}</button></div>`;
+  app.innerHTML=html; wireFaseSw(); wireCards();
+  const box=document.getElementById('exs');
+  if(it.t!=='C'){ F1[it.t][it.code].forEach(sp=>{ const best=bestBW(sp,f1Entries(it.t,it.code,sp.id,n));
+      box.appendChild(bwCard(sp,log.ex[sp.id]||(log.ex[sp.id]={}),()=>save(),best)); }); }
+  else { const key='f1-'+(log.pick||it.c); const cl=log.cardio[key]||(log.cardio[key]={});
+    box.appendChild(cardioCard(key,cl,{ref:'f1-'+n}));
+    document.querySelectorAll('#cpick [data-c]').forEach(b=>b.onclick=()=>{ log.pick=b.dataset.c; save(); renderHoyF1(); }); }
+  document.getElementById('prev').onclick=()=>{ if(S.f1.cur>1){ S.f1.cur--; save(); renderHoyF1(); window.scrollTo(0,0);} };
+  document.getElementById('done').onclick=()=>{ log.date=log.date||todayIso();
+    if(it.t==='C'){ const key='f1-'+(log.pick||it.c); log.cardio[key].done=true; log.cardio[key].date=log.cardio[key].date||log.date; }
+    S.f1.cur++; save(); render(); window.scrollTo(0,0); toast('Sesión guardada'); }; }
+
+/* ---------- FASE II ---------- */
+let f2Mode=null;
+const f2CardioWeek=()=>Math.max(1,f2Week(Math.max(1,lastF2())));
+function f2CardioDone(w){ const o=S.cardio['2-'+w]||{}; return Object.values(o).some(x=>x&&x.done); }
+function f2NextType(){ const last=lastF2(), w=f2Week(Math.max(1,last)); if(last>0&&last%3===0&&!f2CardioDone(w)) return 'cardio'; return 'fuerza'; }
+function renderHoyF2(){
+  if(f2Mode===null){ f2Mode=f2NextType()==='cardio'?(cicloPref()||(f2CardioKey(f2CardioWeek()).includes('LISS')?'liss':'hiit')):'fuerza'; }
+  const cw=f2CardioWeek(), pres=f2CardioKey(cw), presT=pres.includes('LISS')?'liss':'hiit', pend=!f2CardioDone(cw);
+  const seg=`<div class="seg" id="modeSw"><button data-m="fuerza" class="${f2Mode==='fuerza'?'sel':''}">🏋️ Fuerza</button>
+    <button data-m="hiit" class="${f2Mode==='hiit'?'sel':''}">🔥 HIIT${pend&&presT==='hiit'?'<span class="pdot"></span>':''}</button>
+    <button data-m="liss" class="${f2Mode==='liss'?'sel':''}">🚶 LISS${pend&&presT==='liss'?'<span class="pdot"></span>':''}</button></div>`;
+  if(f2Mode!=='fuerza'){ const key=f2Mode==='liss'?'f2-LISS':(presT==='hiit'?pres:f2CardioKey(Math.max(1,cw-1)));
+    const o=S.cardio['2-'+cw]||(S.cardio['2-'+cw]={}); const lg=o[key]||(o[key]={}); const pref=cicloPref();
+    app.innerHTML=`${faseSwitchHTML()}${seg}${cicloBannerHTML(true)}<p class="eyebrow">Fase II · Semana ${cw} · quema-grasa</p>
+      <h2 class="h-big">${CARDIO[key].tag}</h2>
+      <p class="sub">Día aparte, sin fuerza (ideal sábado). Por calendario esta semana toca <b>${presT.toUpperCase()}</b>${pref?`; por tu ciclo mejor <b>${pref.toUpperCase()}</b>`:''}. Cuenta uno por semana.</p>
+      ${CARDIO[key].kb&&!S.cfg.kettlebell?'':''}<div id="cbox"></div>
+      <button class="btn" id="cdone">${lg.done?'✓ Hecho · guardar de nuevo':'Completar sesión ›'}</button>
+      ${S.cfg.kettlebell?'':'<p class="tiny center" style="margin-top:8px">Sin kettlebells rotas HIIT 1 y 2 (pág. 238). Cámbialo en Ajustes si tienes.</p>'}`;
+    wireFaseSw(); wireModeSw();
+    document.getElementById('cbox').appendChild(cardioCard(key,lg,{ref:'c-2-'+cw}));
+    document.getElementById('cdone').onclick=()=>{ lg.done=true; lg.date=lg.date||todayIso(); save(); f2Mode='fuerza'; render(); window.scrollTo(0,0); toast('Quema-grasa guardado'); };
+    return; }
+  const s=S.f2.cur; if(s>F2T()){ app.innerHTML=`${faseSwitchHTML()}<div class="note ok">🎉 <b>Has completado las ${F2T()} sesiones de la Fase II.</b> Si sigues progresando cada sesión, alárgala (Ajustes · +2 semanas): el grueso de tu fuerza sale de aquí (pág. 287). Si te has estancado tras una descarga, es momento de la <b>Fase III</b>.</div>
+      <button class="btn" id="goF3">Pasar a Fase III →</button><button class="btn ghost" id="ext" style="margin-top:8px">Alargar Fase II · +2 semanas</button>`;
+    wireFaseSw(); document.getElementById('goF3').onclick=()=>setFase(3); document.getElementById('ext').onclick=()=>{ S.cfg.f2total=F2T()+6; save(); render(); }; return; }
+  const ses=buildF2(s); const lg=S.f2.logs[s]||{sets:{},out:{},notes:{},acc:{}};
+  app.innerHTML=`${faseSwitchHTML()}${seg}${cicloBannerHTML(true)}
+    <p class="eyebrow">Sesión ${s} · Entrenamiento ${ses.day} · Semana ${f2Week(s)}</p>
+    <h2 class="h-big" style="font-size:25px">${ses.lifts.map(L=>L.key==='glute_bridge'?'Lev. cadera':L.label).join(' · ')}</h2>
+    <label class="alt-toggle" style="margin:4px 0 12px"><input type="checkbox" id="ligera" ${lg.ligera?'checked':''}> Sesión ligera al 60% (regla / descarga) · no cuenta para progresar</label>
+    ${warmGenHTML(false)}<div id="lifts"></div><hr class="sep"><p class="eyebrow">Calistenia y core</p><div id="acc"></div>
+    <div class="btn-row"><button class="btn ghost" id="prev">‹ Anterior</button><button class="btn" id="done">Completar sesión ›</button></div>
+    <p class="tiny center">Descanso: 2 min en barra, 1 min en corporales (pág. 235). Marca cada serie y salta el temporizador.</p>`;
+  wireFaseSw(); wireModeSw(); wireCards();
+  const cont=document.getElementById('lifts'); ses.lifts.forEach(L=>cont.appendChild(liftCard(L,lg)));
+  const acc=document.getElementById('acc');
+  ses.acc.forEach(sp=>{ const ent=[]; for(let p=1;p<s;p++){ const l=S.f2.logs[p]; if(l&&l.date&&l.acc&&l.acc[sp.id]) ent.push(l.acc[sp.id]); }
+    const v=(lg.acc||{})[sp.id]||{}; acc.appendChild(bwCard(sp,v,val=>{ const l=f2Log(s); l.acc[sp.id]=val; save(); },bestBW(sp,ent))); });
+  document.getElementById('ligera').onchange=e=>{ const l=f2Log(s); l.ligera=e.target.checked; save(); renderHoyF2(); };
+  document.getElementById('prev').onclick=()=>{ if(S.f2.cur>1){ S.f2.cur--; save(); renderHoyF2(); window.scrollTo(0,0);} };
+  document.getElementById('done').onclick=()=>{ const l=f2Log(s);
+    const af=ses.lifts.filter(L=>{ const o=l.out[L.key]; return o&&(o.r==='forzado'||o.r==='fallo'); });
+    const go=()=>{ l.date=l.date||todayIso(); S.f2.cur=Math.min(F2T()+1,lastF2()+1); save();
+      f2Mode=f2NextType()==='cardio'?null:'fuerza'; render(); window.scrollTo(0,0); toast(f2NextType()==='cardio'?'Fuerza guardada · toca quema-grasa':'Sesión guardada'); };
+    if(l.ligera){ go(); return; }
+    if(af.length){ let m='Vas a guardar con estos resultados:\n\n'; af.forEach(L=>{ const o=l.out[L.key];
+        m+= o.r==='fallo'?`• ${L.label}: FALLO → repites ${L.W} kg\n`:`• ${L.label}: FORZADO → sube la mitad (${nearestLoadable(L.W+curInc(L.key,s)/2)} kg)\n`; });
+      askConfirm(m+'\n¿Guardar?',go,'Guardar'); } else go(); }; }
+function wireModeSw(){ document.querySelectorAll('#modeSw [data-m]').forEach(b=>b.onclick=()=>{ f2Mode=b.dataset.m; render(); window.scrollTo(0,0); }); }
+function nextPreview(k,r,W,s){ const inc=curInc(k,s); if(r==='fallo') return `Si lo guardas así · próxima vez: <b>mismo peso, ${W} kg</b>`;
+  const nw=nearestLoadable(W+(r==='forzado'?inc/2:inc)); return `Si lo guardas así · próxima vez: <b>+${+(nw-W).toFixed(2)} kg → ${nw} kg</b>${r==='forzado'?' (medio incremento)':''}`; }
+function outcomeBadge(r){ return r==='fallo'?'<span class="fail-tag">✗ Fallo</span>':r==='forzado'?'<span class="mid-tag">● Forzado</span>':r==='limpio'?'<span class="done-tag">✓ Limpio</span>':''; }
+function f2PrevLine(L,s){ const ps=prevAppearance(L.key,s); if(!ps) return `<div class="prevline">Primera vez · peso de partida <b>${L.W} kg</b> (tu 5RM −${Math.round(S.cfg.descarga*100)}%). Si la barra vuela, ánclalo más alto con ✎ (pág. 236).</div>`;
+  const pw=sessionW(L.key,ps), o=outOf(ps,L.key), d=+(L.W-pw).toFixed(2);
+  const chip=d>0?`<span class="dlt up">▲ +${d} kg</span>`:d<0?`<span class="dlt dn">▼ ${d} kg</span>`:`<span class="dlt eq">= repites</span>`;
+  return `<div class="prevline">Última vez (S${ps}): ${pw} kg · <b>${o.r||'limpio'}</b>${o.esf?` · esfuerzo <b>${o.esf}/5</b>`:''} → hoy <b>${L.W} kg</b> ${chip}</div>`; }
+function liftCard(L,lg){ const s=S.f2.cur; const div=document.createElement('div'); div.className='card';
+  const o=(lg.out&&lg.out[L.key])||{}, r=o.r||''; const allDone=L.sets.every((_,i)=>lg.sets&&lg.sets[L.key+'_'+i]);
+  if(allDone||r||L===null) div.classList.add('open'); if(!allDone&&!r) div.classList.add('open');
+  const fails=consecutiveFails(L.key);
+  div.innerHTML=`<div class="card-head"><div class="left"><span class="ex-name">${L.label}</span></div>
+    <div style="display:flex;align-items:center;gap:8px"><span class="ex-scheme">${L.scheme} · ${L.W} kg</span>
+      <button class="edit-w" data-edit title="Editar peso">✎</button>${outcomeBadge(r)}<span class="chev">▶</span></div></div>
+    <div class="card-body">${lg.ligera?'<div class="note">Sesión ligera: 60% de tu peso actual. No modifica tu progresión.</div>':''}
+      ${f2PrevLine(L,s)}
+      ${L.reduced?'<p class="tiny" style="margin:0 0 4px">Ya calentaste este grupo antes: solo las 2 últimas de aproximación (pág. 161).</p>':''}
+      ${L.sets.map((st,i)=>`<div class="set-row"><div class="set-meta"><div class="lbl">${st.work?'Trabajo':(st.t||'Aprox.')}</div><div class="reps">${st.r}</div></div>
+        <div class="set-w ${st.work?'workset':''}"><span class="kg">${st.w}</span><span class="u">kg</span></div>
+        <button class="tick ${lg.sets&&lg.sets[L.key+'_'+i]?'on':''}" data-i="${i}" data-rest="${st.work?S.cfg.restBarra:(st.rest||30)}">✓</button></div>`).join('')}
+      ${barbellHTML(L.W)}
+      ${fails>=3?`<div class="stall-note">⚠️ ${fails} sesiones seguidas sin subir en ${L.label}: estás <b>estancada</b> (pág. 241).<button class="btn ghost" data-dl style="margin-top:8px">Diagnosticar estancamiento →</button></div>`:''}
+      <div class="blk"><span class="out-q">¿Cómo fue con ${L.W} kg?</span><div class="outcome3">
+        <button class="o3 ok ${r==='limpio'?'sel':''}" data-r="limpio">✅ Limpio</button><button class="o3 mid ${r==='forzado'?'sel':''}" data-r="forzado">🟡 Forzado</button><button class="o3 no ${r==='fallo'?'sel':''}" data-r="fallo">❌ No completé</button></div>
+        <div class="o3-next" data-next>${nextPreview(L.key,r||'limpio',L.W,s)}</div>
+        <p class="tiny" style="margin:6px 0 0">Limpio: todas las reps con buena técnica · Forzado: completas pero muy lenta → medio incremento · No completé las ${L.key==='peso_muerto'?'10':(LIFTS[L.key].sets*LIFTS[L.key].reps)} reps → mantienes (pág. 241).</p></div>
+      <div class="blk"><span class="out-q">¿Cuánto te costó? <span class="tiny">(1 fácil · 5 al límite)</span></span><div class="rir">${[1,2,3,4,5].map(n=>`<button class="rir-b l${n} ${o.esf==n?'sel':''}" data-esf="${n}">${n}</button>`).join('')}</div></div>
+      <div class="help"><b>Claves:</b> ${LIFTS[L.key].cues.join(' · ')}<br><span class="pageref">📖 Guerrera Espartana · pág. ${L.page}</span></div>
+      <div class="field" style="margin-top:10px"><label>Notas</label><textarea rows="2" data-note placeholder="Sensaciones, molestias, ajustes…">${esc((lg.notes||{})[L.key]||'')}</textarea></div></div>`;
+  div.querySelector('.card-head').onclick=e=>{ if(!e.target.closest('button')) div.classList.toggle('open'); };
+  div.querySelector('[data-edit]').onclick=e=>{ e.stopPropagation(); openEditWeight(L.key); };
+  div.querySelectorAll('.tick').forEach(t=>t.onclick=()=>{ const l=f2Log(s), k=L.key+'_'+t.dataset.i; l.sets[k]=!l.sets[k]; t.classList.toggle('on',l.sets[k]); save(); if(l.sets[k]) startRest(+t.dataset.rest); });
+  div.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{ const l=f2Log(s); l.out[L.key]={...(l.out[L.key]||{}),r:b.dataset.r}; save();
+    div.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x===b)); div.querySelector('[data-next]').innerHTML=nextPreview(L.key,b.dataset.r,L.W,s);
+    const h=div.querySelector('.card-head > div:last-child'); h.querySelectorAll('.fail-tag,.done-tag,.mid-tag').forEach(x=>x.remove()); h.querySelector('.chev').insertAdjacentHTML('beforebegin',outcomeBadge(b.dataset.r)); });
+  div.querySelectorAll('[data-esf]').forEach(b=>b.onclick=()=>{ const l=f2Log(s); l.out[L.key]={...(l.out[L.key]||{r:'limpio'}),esf:+b.dataset.esf}; save(); div.querySelectorAll('[data-esf]').forEach(x=>x.classList.toggle('sel',x===b)); });
+  div.querySelector('[data-note]').addEventListener('change',e=>{ const l=f2Log(s); l.notes[L.key]=e.target.value; save(); });
+  const dl=div.querySelector('[data-dl]'); if(dl) dl.onclick=()=>openDeload(L.key);
+  return div; }
+function openEditWeight(k){ const s=S.f2.cur, L=LIFTS[k]; const lg=S.f2.logs[s]; const ov=lg&&lg.override&&lg.override[k];
+  const cur=ov!=null?ov:nearestLoadable(workWeight(k,s));
+  const box=openDlg(`<h3 class="dl-title">Editar peso · ${L.label}</h3><p class="dl-intro">Peso de hoy: <b>${cur} kg</b>. Pon el que vas a hacer de verdad.</p>
+    <div class="field"><label>Peso (kg)</label><input type="number" inputmode="decimal" id="ew" value="${cur}" step="0.5"></div><p class="tiny" id="ewp"></p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px"><button class="btn" id="ewf">Anclar · de aquí en adelante</button><button class="btn ghost" id="ewt">Solo por hoy</button><button class="btn ghost" id="ewc">Cancelar</button></div>
+    <p class="tiny" style="margin-top:8px">“Anclar” mueve tu punto de partida (ideal en las primeras sesiones, cuando subes hasta que la barra se frena — pág. 236). “Solo hoy” no toca las próximas.</p>`);
+  const val=()=>{ const v=parseFloat(box.querySelector('#ew').value); return v>0?nearestLoadable(v):null; };
+  const upd=()=>{ const v=val(); box.querySelector('#ewp').textContent=v?(isLoadable(+box.querySelector('#ew').value)?`Cargable: ${v} kg`:`Con tus discos: ${v} kg`):''; };
+  box.querySelector('#ew').addEventListener('input',upd); upd();
+  box.querySelector('#ewc').onclick=closeDlg;
+  box.querySelector('#ewt').onclick=()=>{ const v=val(); if(!v) return; f2Log(s).override[k]=v; save(); closeDlg(); render(); toast(`Solo hoy: ${v} kg`); };
+  box.querySelector('#ewf').onclick=()=>{ const v=val(); if(!v) return; const l=f2Log(s); delete l.override[k];
+    S.cfg.deloads[k]=(S.cfg.deloads[k]||[]).filter(d=>d.session!==s); S.cfg.deloads[k].push({session:s,weight:v,factor:factorAt(k,s),tipo:'ancla'}); save(); closeDlg(); render(); toast(`Anclado en ${v} kg`); }; }
+function openDeload(k){ const L=LIFTS[k]; const ns=S.f2.cur; const cw=nearestLoadable(workWeight(k,ns)); const nw=nearestLoadable(cw*0.9);
+  const ci=nearestLoadable(cw+curInc(k,ns)), fac=factorAt(k,ns)/2; const isPress=k==='banca'||k==='militar';
+  const box=openDlg(`<h3 class="dl-title">Estancamiento · ${L.label}</h3><p class="dl-intro">El libro da 5 motivos (pág. 242-243). Descarta los tres primeros antes de descargar.</p>
+    <label class="dl-cause"><input type="checkbox" data-c><span><b>1 · ¿Comes suficiente?</b> Registra unos días: debes estar ±5% de tus calorías. En definición es más fácil estancarse: sube un poco unos días.</span></label>
+    <label class="dl-cause"><input type="checkbox" data-c><span><b>2 · ¿Descansas suficiente?</b> 7-8 h de sueño y sin CrossFit/cardio extra que te robe recuperación.</span></label>
+    <label class="dl-cause"><input type="checkbox" data-c><span><b>3 · ¿Te mueves bien?</b> Grábate de frente y de lado, a cámara lenta. Muchos fallos de técnica son de movilidad.</span></label>
+    ${isPress?'<div class="note">💡 Es un press: prueba un par de sesiones a hacerlo al principio, fresca, antes de descargar.</div>':''}
+    <div class="note">🌙 Si coincide con tu regla o los días previos, quizá no es estancamiento: marca la semana como <b>ligera al 60%</b>.</div>
+    <div class="dl-box"><b>4 · Descargar</b> — un paso atrás para tomar impulso:<div class="dl-prev">Peso: <b>${cw} → ${nw} kg</b> (−10%)<br>Incremento: <b>la mitad</b> (ahora ${+(ci-cw).toFixed(2)} kg → ${+(curInc(k,ns)/2).toFixed(2)} kg)</div><span class="tiny">Se aplica desde la próxima ${L.label.toLowerCase()}. El historial se conserva.</span></div>
+    <div class="note"><b>5 ·</b> Si ya descargaste y sigues estancada en varios movimientos, cerca del estándar de intermedia (Progreso): ¡enhorabuena! Las ganancias lineales se acabaron: <b>pasa a Fase III</b>.</div>
+    <div class="btn-row"><button class="btn ghost" id="dlc">Cancelar</button><button class="btn" id="dla" disabled>Aplicar descarga</button></div>`);
+  const ch=[...box.querySelectorAll('[data-c]')], ap=box.querySelector('#dla');
+  ch.forEach(c=>c.onchange=()=>ap.disabled=!ch.every(x=>x.checked));
+  box.querySelector('#dlc').onclick=closeDlg;
+  ap.onclick=()=>{ const at=nextAppearance(k)||ns; S.cfg.deloads[k]=(S.cfg.deloads[k]||[]).filter(d=>d.session!==at); S.cfg.deloads[k].push({session:at,weight:nw,factor:fac,tipo:'descarga'}); save(); closeDlg(); render(); toast(`Descarga: ${nw} kg, incremento ½`); }; }
+
+/* ---------- FASES III y IV: doble progresión (pág. 257-258, 273) ---------- */
+const P3={ph:'f3',fase:3,total:()=>Infinity,
+  day:n=>F3_DAYS[(n-1)%5], week:n=>Math.ceil(n/5)};
+const P4={ph:'f4',fase:4,total:()=>16,
+  day:n=>{ const code=F4_SEQ[(n-1)%16], bio=S.cfg.biotipo||'pera';
+    if(code==='A'||code==='B') return {id:code,name:`Sesión ${code} · ${BIO[bio].ico} ${BIO[bio].n}`,tipo:'mix',rest:150,ex:F4[bio][code]};
+    return {id:code,name:CARDIO['f4-'+code].tag,tipo:'quema',cardio:true,cardioKey:'f4-'+code,ex:[]}; },
+  week:n=>Math.ceil(n/4)};
+function dpLast(P,dayId,exId,before){ const st=S[P.ph]; for(let n=before-1;n>=1;n--){ const l=st.logs[n]; if(l&&l.date&&!l.skipped&&l.dayId===dayId&&l.ex&&l.ex[exId]) return {n,l:l.ex[exId]}; } return null; }
+function dpWeight(P,ex){ const W=S[P.ph].weights; if(W[ex.id]==null) W[ex.id]=seedWeight(ex.base,ex.rMin); return W[ex.id]; }
+function upWeight(w){ return Math.max(nearestLoadable(w*1.05),nextLoadableAbove(w)); }
+function dpSuggest(P,day,ex){ const p=dpLast(P,day.id,ex.id,S[P.ph].cur); if(!p) return null;
+  const reps=(p.l.sets||[]).map(x=>+x||0); const txt=`${p.l.w??'—'} kg · ${reps.join('·')}${p.l.r?' · '+p.l.r:''}${p.l.esf?' · esf '+p.l.esf+'/5':''}`;
+  const top=reps.length>=ex.sets&&reps.every(r=>r>=ex.rMax);
+  if(top) return {txt,hint:`Topaste ${ex.rMax} en todas → sube a ${upWeight(p.l.w)} kg y vuelve a ${ex.rMin} reps`,up:true};
+  if(reps[0]&&reps[0]<ex.rMin) return {txt,hint:`No llegaste a ${ex.rMin} en la 1ª serie: baja un poco el peso`,dn:true};
+  return {txt,hint:ex.rMax>ex.rMin?`Mismo peso: suma repeticiones hasta ${ex.rMax} en todas`:'Supera tu marca'}; }
+const WG={sentadilla:'pierna',peso_muerto:'pierna',glute_bridge:'pierna',hip_thrust:'pierna',sent_frontal:'pierna',rumano:'pierna',desplantes:'pierna',banca:'empuje',militar:'empuje',remo:'tiron',clean:'clean'};
+function renderHoyDP(P){ const st=S[P.ph];
+  if(P.fase===4&&!S.cfg.biotipo){ app.innerHTML=`${faseSwitchHTML()}<div class="note">La Fase IV se personaliza por biotipo. Elígelo (o mide cintura y cadera en Cuerpo).</div>${bioPickHTML()}`; wireFaseSw(); wireBioPick(); return; }
+  if(st.cur>P.total()){ app.innerHTML=`${faseSwitchHTML()}<div class="note ok">🎉 <b>Fase IV completada.</b> Probablemente el menor % de grasa de tu vida… y el metabolismo algo frenado. Ahora: <b>dieta inversa</b> 10-15 días antes de volver a la normalidad (pág. 201). Después, un respiro de la barra de unas semanas o repetir la Fase I (pág. 288).</div>
+    <button class="btn ghost" id="back">‹ Volver a la última sesión</button>`; wireFaseSw(); document.getElementById('back').onclick=()=>{ st.cur=16; save(); render(); }; return; }
+  const n=st.cur, day=P.day(n), wk=P.week(n); const log=st.logs[n]||{ex:{},cardio:{}};
+  let sub='';
+  if(day.tipo==='fuerza') sub='Fuerza · cerca de tu 1RM, pocas reps · descansa 2-3 min (tensión mecánica).';
+  else if(day.tipo==='hiper') sub='Hipertrofia · menos peso, más reps · descansa 1-2 min (estrés metabólico).';
+  else if(day.tipo==='potencia') sub='Potencia: máxima velocidad. Después, HIIT o LISS según la semana.';
+  else if(day.tipo==='mix') sub='Pocas series, alta intensidad: es lo que protege tu músculo en déficit. Si mantienes la fuerza este mes, has hecho un gran trabajo (pág. 273).';
+  else sub='Quema-grasa. <b>Hoy es tu día de RECARGA</b> (+10-15% sobre mantenimiento, 50-60% carbohidrato) — pág. 271.';
+  app.innerHTML=`${faseSwitchHTML()}${cicloBannerHTML(true)}
+    <p class="eyebrow">Fase ${P.fase===3?'III':'IV'} · Semana ${wk}${P.fase===3?` · Día ${(n-1)%5+1}/5`:` · ${n}/16`}</p>
+    <h2 class="h-big" style="font-size:25px">${day.name}</h2><p class="sub">${sub}</p>
+    ${day.ex.length?warmGenHTML(false):''}<div id="exs"></div><div id="cbox"></div>
+    <div class="btn-row"><button class="btn ghost" id="prev">‹ Anterior</button><button class="btn" id="done">Completar día ›</button></div>
+    ${P.fase===3&&day.id==='po'?'<button class="btn ghost" id="skip">Saltar este día (flotante)</button>':''}`;
+  wireFaseSw(); wireCards();
+  const box=document.getElementById('exs'); const seen=new Set();
+  day.ex.forEach(ex=>{ if(ex.kind==='carga'){ const g=WG[ex.base]; box.appendChild(dpCard(P,day,ex,log,seen.has(g))); seen.add(g); }
+    else { const ent=[]; Object.entries(st.logs).forEach(([k,l])=>{ if(+k<n&&l.date&&l.ex&&l.ex[ex.id]) ent.push(l.ex[ex.id]); });
+      box.appendChild(bwCard(ex,(log.ex||{})[ex.id]||{},v=>{ const l=dpEnsure(P); l.ex[ex.id]=v; save(); },bestBW(ex,ent))); } });
+  let ckey=null, rondas=null;
+  if(day.cardio){ if(P.fase===3){ const pres=f3CardioKey(wk); const pick=log.pick||(cicloPref()==='liss'?'f3-LISS':pres.key); ckey=pick; rondas=pick===pres.key?pres.rondas:null;
+      const alt=pres.key==='f3-LISS'?f3CardioKey(wk-1>0?wk-1:1):{key:'f3-LISS'};
+      const cb=document.getElementById('cbox'); cb.innerHTML=`<hr class="sep"><p class="eyebrow">HIIT / LISS · semana ${wk}</p><div class="ntabs" id="cpick"><button data-k="${pres.key}" class="${ckey===pres.key?'sel':''}">${CARDIO[pres.key].tag} (calendario)</button><button data-k="${alt.key}" class="${ckey===alt.key?'sel':''}">${CARDIO[alt.key].tag}</button></div>`;
+      cb.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{ const l=dpEnsure(P); l.pick=b.dataset.k; save(); render(); });
+      if(ckey===alt.key) rondas=alt.rondas; }
+    else ckey=day.cardioKey;
+    const l=dpEnsure(P); const cl=l.cardio[ckey]||(l.cardio[ckey]={}); document.getElementById('cbox').appendChild(cardioCard(ckey,cl,{ref:P.ph+'-'+n,rondas}));
+    if(P.fase===4&&S.cfg.biotipo==='pera') document.getElementById('cbox').insertAdjacentHTML('beforeend','<div class="note">🍐 Pera: haz el HIIT + cardio en ayunas, con cafeína y BCAA antes (pág. 267).</div>'); }
+  document.getElementById('prev').onclick=()=>{ if(st.cur>1){ st.cur--; save(); render(); window.scrollTo(0,0);} };
+  const sk=document.getElementById('skip'); if(sk) sk.onclick=()=>{ st.logs[n]={...dpEnsure(P),date:todayIso(),dayId:day.id,skipped:true}; st.cur++; save(); render(); toast('Día flotante saltado'); };
+  document.getElementById('done').onclick=()=>{ const l=dpEnsure(P); l.date=l.date||todayIso(); l.dayId=day.id; const sub=[];
+    day.ex.forEach(ex=>{ if(ex.kind!=='carga') return; const e=l.ex[ex.id]||(l.ex[ex.id]={}); if(e.w==null) e.w=st.weights[ex.id];
+      const reps=(e.sets||[]).map(x=>+x||0); if(e.w&&reps.length>=ex.sets&&reps.slice(0,ex.sets).every(r=>r>=ex.rMax)){ st.weights[ex.id]=upWeight(e.w); sub.push(`${ex.label} → ${st.weights[ex.id]} kg`); } });
+    if(ckey&&l.cardio[ckey]){ l.cardio[ckey].done=true; l.cardio[ckey].date=l.cardio[ckey].date||l.date; }
+    st.cur++; save();
+    askConfirm(sub.length?`Día guardado. Subes peso la próxima vez:\n• ${sub.join('\n• ')}`:'Día guardado. La próxima vez, a batir las repeticiones.',()=>{ render(); window.scrollTo(0,0); },'Siguiente'); }; }
+function dpEnsure(P){ const st=S[P.ph], n=st.cur; if(!st.logs[n]) st.logs[n]={ex:{},cardio:{}}; const l=st.logs[n]; if(!l.ex) l.ex={}; if(!l.cardio) l.cardio={}; l.dayId=P.day(n).id; return l; }
+function dpCard(P,day,ex,log,reduced){ const st=S[P.ph]; const e=(log.ex||{})[ex.id]||{}; const w=e.w!=null?e.w:dpWeight(P,ex);
+  const sug=dpSuggest(P,day,ex); const L=LIFTS[ex.base]; const rest=day.rest||120;
+  const div=document.createElement('div'); div.className='card open';
+  const wu=warmups(w,reduced); const r=e.r||'';
+  div.innerHTML=`<div class="card-head"><div class="left"><span class="ex-name">${esc(ex.label)}</span></div><div style="display:flex;gap:8px;align-items:center"><span class="ex-scheme">${ex.sets}×${ex.rMin===ex.rMax?ex.rMin:ex.rMin+'-'+ex.rMax}</span>${outcomeBadge(r)}<span class="chev">▶</span></div></div>
+    <div class="card-body">${sug?`<div class="prevline">${sug.up?'🔼':sug.dn?'🔽':'🎯'} Última vez: <b>${esc(sug.txt)}</b><br>${esc(sug.hint)}</div>`:`<div class="prevline">Primera vez: peso estimado desde tus marcas (1RM ≈ peso × (1 + reps × 0,0333), pág. 237). Ajústalo si hace falta.</div>`}
+      <div class="acc-input"><span>Peso de trabajo</span><input class="inline-num" style="width:84px!important" type="number" inputmode="decimal" data-w value="${w}"><span class="tiny">kg</span>
+        <button class="btn ghost sm" data-rest>⏱ ${fmtSec(rest)}</button></div>
+      ${wu.length?`<div class="wu-box"><span class="wu-t">Aproximación${reduced?' (grupo ya caliente: 2 últimas)':''}</span>${wu.map(x=>`<div class="wu-s"><span>${x.r}${x.t?' · '+x.t:''}</span><b>${x.w} kg</b></div>`).join('')}</div>`:''}
+      <span class="wu-t" style="margin-top:8px">Repeticiones por serie</span>
+      <div class="sets-grid">${Array.from({length:ex.sets},(_,i)=>`<label class="sg"><span>S${i+1}</span><input type="number" inputmode="numeric" data-i="${i}" value="${esc((e.sets||[])[i]??'')}" placeholder="${ex.rMax}"></label>`).join('')}</div>
+      <div data-bb>${barbellHTML(w)}</div>
+      <div class="blk"><span class="out-q">¿Técnica?</span><div class="outcome3"><button class="o3 ok ${r==='limpio'?'sel':''}" data-r="limpio">✅ Limpio</button><button class="o3 mid ${r==='forzado'?'sel':''}" data-r="forzado">🟡 Forzado</button><button class="o3 no ${r==='fallo'?'sel':''}" data-r="fallo">❌ Fallo técnico</button></div></div>
+      <div class="blk"><span class="out-q">¿Cuánto te costó? <span class="tiny">(1-5)</span></span><div class="rir">${[1,2,3,4,5].map(k=>`<button class="rir-b l${k} ${e.esf==k?'sel':''}" data-esf="${k}">${k}</button>`).join('')}</div></div>
+      <div class="help">${ex.note?esc(ex.note)+'<br>':''}${L?'<b>Claves:</b> '+L.cues.join(' · ')+'<br>':''}${ex.page?`<span class="pageref">📖 pág. ${ex.page}</span>`:''}</div>
+      <div class="field" style="margin-top:8px"><label>Notas</label><input type="text" data-note value="${esc(e.nota||'')}" placeholder="Sensaciones…"></div></div>`;
+  const set=(f,v)=>{ const l=dpEnsure(P); l.ex[ex.id]=l.ex[ex.id]||{w}; l.ex[ex.id][f]=v; save(); };
+  div.querySelector('.card-head').onclick=()=>div.classList.toggle('open');
+  div.querySelector('[data-w]').addEventListener('change',ev=>{ const v=parseFloat(ev.target.value); if(v>0){ const nv=nearestLoadable(v); st.weights[ex.id]=nv; set('w',nv); ev.target.value=nv; div.querySelector('[data-bb]').innerHTML=barbellHTML(nv); } });
+  div.querySelector('[data-rest]').onclick=()=>startRest(rest);
+  div.querySelectorAll('[data-i]').forEach(inp=>inp.addEventListener('change',ev=>{ const l=dpEnsure(P); const x=l.ex[ex.id]=l.ex[ex.id]||{w}; x.sets=x.sets||[]; x.sets[+ev.target.dataset.i]=ev.target.value; if(x.w==null)x.w=w; save(); }));
+  div.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{ set('r',b.dataset.r); div.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x===b)); });
+  div.querySelectorAll('[data-esf]').forEach(b=>b.onclick=()=>{ set('esf',+b.dataset.esf); div.querySelectorAll('[data-esf]').forEach(x=>x.classList.toggle('sel',x===b)); });
+  div.querySelector('[data-note]').addEventListener('change',ev=>set('nota',ev.target.value));
+  return div; }
+function bioPickHTML(){ const rc=ratioCC(); return `<div class="seg" id="bioPick">${Object.entries(BIO).map(([k,b])=>`<button data-b="${k}" class="${S.cfg.biotipo===k?'sel':''}">${b.ico} ${b.n}</button>`).join('')}</div>
+  ${rc?`<p class="tiny">Tu cintura/cadera: <b>${rc.r.toFixed(2)}</b> → sugiere <b>${BIO[rc.bio].n}</b> (>0,8 manzana · <0,75 pera · entre medias espárrago, pág. 50).</p>`:'<p class="tiny">Mide cintura (zona más estrecha, ombligo) y cadera (zona más ancha, mitad del glúteo) en Cuerpo › Medidas para calcularlo.</p>'}`; }
+function wireBioPick(){ document.querySelectorAll('#bioPick [data-b]').forEach(b=>b.onclick=()=>{ S.cfg.biotipo=b.dataset.b; save(); render(); toast('Biotipo: '+BIO[b.dataset.b].n); }); }
+
+/* ---------- Cambios de fase y graduaciones ---------- */
+function setFase(n){ if(n===S.fase) return;
+  const started={1:true,2:!!(S.f2.started||lastF2()>0),3:!!S.f3.started,4:!!S.f4.started}[n];
+  if(!started){ if(n===2) return openGrad2(); if(n===3) return openGrad3(); if(n===4) return openGrad4(); }
+  askConfirm(`Cambiar a Fase ${FASE_N[n]}. Cada fase guarda sus datos: no se borra nada.`,()=>{ S.fase=n; save(); f2Mode=null; view='hoy'; render(); window.scrollTo(0,0); },'Cambiar'); }
+function rmFields(){ return ['sentadilla','banca','peso_muerto','glute_bridge','hip_thrust','militar','clean'].map(k=>`<div class="field"><label>${LIFTS[k].label}</label><input type="number" inputmode="decimal" data-rm="${k}" value="${S.cfg.rm[k]}"></div>`).join(''); }
+function readRm(box){ box.querySelectorAll('[data-rm]').forEach(i=>{ const v=parseFloat(i.value); if(v>0) S.cfg.rm[i.dataset.rm]=v; }); }
+function openGrad2(){ const box=openDlg(`<h3 class="dl-title">Empezar Fase II · Fuerza</h3>
+  <p class="dl-intro">Introduce tu <b>5RM estimado</b> (peso con el que harías 5 repeticiones limpias). La app <b>resta un ${Math.round(S.cfg.descarga*100)}%</b> y arrancas desde ahí (pág. 236). Si no tienes ni idea, pon algo conservador: en la 1ª sesión subes hasta que la barra se frene y lo anclas con ✎.</p>
+  <div class="grid2">${rmFields()}</div>
+  <label class="alt-toggle"><input type="checkbox" id="g_clean" ${S.cfg.clean?'checked':''}> Puedo hacer clean (si no: remo 3×5)</label>
+  <div class="btn-row"><button class="btn ghost" id="gc">Cancelar</button><button class="btn" id="gg">Empezar</button></div>`);
+  box.querySelector('#gc').onclick=closeDlg;
+  box.querySelector('#gg').onclick=()=>{ readRm(box); S.cfg.clean=box.querySelector('#g_clean').checked; S.f2.started=todayIso(); S.fase=2; S.f2.cur=lastF2()+1; save(); closeDlg(); view='hoy'; render(); toast('¡A por la Fase II!'); }; }
+function gradRows(list,weights){ return list.map(ex=>`<div class="stat-line"><span>${esc(ex.label)} <span class="tiny">${ex.sets}×${ex.rMin}-${ex.rMax}</span></span><input class="inline-num" style="width:80px!important" type="number" inputmode="decimal" data-gw="${ex.id}" value="${weights[ex.id]??seedWeight(ex.base,ex.rMin)}"></div>`).join(''); }
+function openGrad3(){ const list=F3_DAYS.flatMap(d=>d.ex.filter(e=>e.kind==='carga'));
+  const box=openDlg(`<h3 class="dl-title">Empezar Fase III · Hipertrofia</h3>
+  <p class="dl-intro">Ya no eres novata: torso-pierna con días de fuerza (empieza con tu <b>3RM</b>) e hipertrofia (tu <b>8RM</b>). He estimado los pesos desde tus marcas de Fase II con la fórmula del libro (pág. 237, 257). Los ejercicios nuevos (frontal, rumano, desplantes, remo) son <b>orientativos</b>: ajústalos en la 1ª sesión.</p>
+  ${gradRows(list,S.f3.weights)}
+  <div class="btn-row"><button class="btn ghost" id="gc">Cancelar</button><button class="btn" id="gg">Empezar Fase III</button></div>`);
+  box.querySelector('#gc').onclick=closeDlg;
+  box.querySelector('#gg').onclick=()=>{ box.querySelectorAll('[data-gw]').forEach(i=>{ const v=parseFloat(i.value); if(v>0) S.f3.weights[i.dataset.gw]=nearestLoadable(v); });
+    S.f3.started=todayIso(); S.fase=3; save(); closeDlg(); view='hoy'; render(); toast('¡Bienvenida a la Fase III!'); }; }
+function openGrad4(){ const draw=()=>{ const bio=S.cfg.biotipo; const list=bio?[...F4[bio].A,...F4[bio].B].filter(e=>e.kind==='carga'):[];
+  const box=openDlg(`<h3 class="dl-title">Empezar Fase IV · Ajuste final</h3>
+   <p class="dl-intro">4 semanas: full-body A/B adaptado a tu biotipo + complejos con barra el día de recarga. Pensada para un momento concreto (¿verano?). El bloque de <b>definición máxima</b> exige: buena base muscular, metabolismo sano, al menos 2-3 meses de programa y grasa ≤20-22% (pág. 198, 288). Si no, usa definición normal o mantenimiento.</p>
+   ${bioPickHTML()}${bio?`<p class="eyebrow" style="margin-top:12px">Pesos de partida</p>${gradRows(list,S.f4.weights)}`:''}
+   <div class="btn-row"><button class="btn ghost" id="gc">Cancelar</button><button class="btn" id="gg" ${bio?'':'disabled'}>Empezar Fase IV</button></div>`);
+   box.querySelectorAll('#bioPick [data-b]').forEach(b=>b.onclick=()=>{ S.cfg.biotipo=b.dataset.b; save(); draw(); });
+   box.querySelector('#gc').onclick=closeDlg;
+   box.querySelector('#gg').onclick=()=>{ box.querySelectorAll('[data-gw]').forEach(i=>{ const v=parseFloat(i.value); if(v>0) S.f4.weights[i.dataset.gw]=nearestLoadable(v); });
+     S.f4.started=todayIso(); S.fase=4; save(); closeDlg(); view='hoy'; render(); toast('Fase IV: a esculpir'); }; };
+  draw(); }
+
+/* ---------- Onboarding ---------- */
+function renderOnboarding(){ const n=S.cfg.nutri;
+  app.innerHTML=`<p class="eyebrow">Guerrera Espartana</p><h1 class="h-big">Sexy, saludable,<br>fuerte y feliz</h1>
+  <p class="sub">El peso que añades a la barra importa más que el de la báscula. Configuremos tu punto de partida; todo se puede cambiar luego en Ajustes.</p>
+  <div class="card"><div class="card-body body-open">
+    <p class="eyebrow">¿En qué fase empiezas?</p>
+    <div class="seg" id="obF">${[1,2,3].map(f=>`<button data-f="${f}" class="${S.fase===f?'sel':''}">Fase ${['I','II','III'][f-1]}</button>`).join('')}</div>
+    <p class="tiny" id="obFt"></p>
+    <p class="eyebrow" style="margin-top:14px">Tus datos</p>
+    <div class="grid2"><div class="field"><label>Edad</label><input type="number" id="ob_edad" value="${n.edad||''}" inputmode="numeric"></div>
+      <div class="field"><label>Altura (cm)</label><input type="number" id="ob_alt" value="${n.altura||''}" inputmode="numeric"></div>
+      <div class="field"><label>Peso (kg)</label><input type="number" id="ob_peso" value="${n.peso||''}" inputmode="decimal"></div>
+      <div class="field"><label>% grasa (opc.)</label><input type="number" id="ob_grasa" value="${n.grasa||''}" inputmode="decimal"></div></div>
+    <div id="obRm"><p class="eyebrow" style="margin-top:6px">5RM estimado (la app resta un 40%)</p><div class="grid2">${rmFields()}</div></div>
+    <label class="alt-toggle"><input type="checkbox" id="ob_kb" ${S.cfg.kettlebell?'checked':''}> Tengo kettlebells</label>
+    <label class="alt-toggle"><input type="checkbox" id="ob_clean" ${S.cfg.clean?'checked':''}> Puedo hacer clean (si no, remo)</label>
+    <p class="eyebrow" style="margin-top:16px">Tu ciclo</p>
+    <div class="grid2"><div class="field"><label>Inicio última regla</label><input type="date" id="ob_reg" max="${todayIso()}"></div>
+      <div class="field"><label>Duración ciclo (días)</label><input type="number" id="ob_len" value="${S.ciclo.len}" inputmode="numeric"></div></div>
+    <label class="alt-toggle"><input type="checkbox" id="ob_anti" ${S.ciclo.anticon?'checked':''}> Tomo anticonceptivos hormonales (los ajustes por fase no aplican)</label>
+  </div></div>
+  <button class="btn" id="obGo">Empezar</button>`;
+  const ftxt={1:'4 semanas con tu cuerpo: patrones nuevos (hip thrust y variantes) antes de cargar barra. Si vienes de Desencadenado o Efecto Kettlebell, puedes hacer solo las semanas 3-4.',
+    2:'Full-body A/B con barra, progresión lineal. Si ya cumples los estándares de intermedia y tienes experiencia full-body, puedes recortarla a 1 mes o ir a la III (pág. 287).',
+    3:'Torso-pierna con días de fuerza e hipertrofia. Al empezar te pediré/estimaré tus 3RM y 8RM.'};
+  const paint=()=>{ document.getElementById('obFt').textContent=ftxt[S.fase]; document.getElementById('obRm').classList.toggle('hidden',S.fase===1); };
+  document.querySelectorAll('#obF [data-f]').forEach(b=>b.onclick=()=>{ S.fase=+b.dataset.f; document.querySelectorAll('#obF [data-f]').forEach(x=>x.classList.toggle('sel',x===b)); paint(); }); paint();
+  document.getElementById('obGo').onclick=()=>{ const g=id=>parseFloat(document.getElementById(id).value);
+    S.cfg.nutri={edad:g('ob_edad')||'',altura:g('ob_alt')||'',peso:g('ob_peso')||'',grasa:g('ob_grasa')||''};
+    if(g('ob_peso')>0) S.body.daily[todayIso()]={peso:g('ob_peso'),...(g('ob_grasa')>0?{grasa:g('ob_grasa')}:{})};
+    readRm(app); S.cfg.kettlebell=document.getElementById('ob_kb').checked; S.cfg.clean=document.getElementById('ob_clean').checked;
+    const r=document.getElementById('ob_reg').value; if(r&&!S.ciclo.starts.includes(r)) S.ciclo.starts.push(r);
+    S.ciclo.len=g('ob_len')||28; S.ciclo.anticon=document.getElementById('ob_anti').checked;
+    if(S.fase===2) S.f2.started=todayIso();
+    S.onboarded=true; save(); view='hoy';
+    if(S.fase===3){ S.fase=2; render(); openGrad3(); } else { render(); toast('¡A entrenar, guerrera!'); } }; }
+
+/* ---------- PLAN / CALENDARIO ---------- */
+function phaseItems(){ const f=S.fase, done=[], todo=[];
+  if(f===1){ const seq=f1Seq(); seq.forEach((it,i)=>{ const n=i+1, l=S.f1.logs[n]; const lab=it.t==='C'?(it.c==='LISS'?'LISS':'HIIT'):`${it.t}${it.code}`;
+      const o={lab,c:it.t==='C',pos:i}; if(l&&l.date) done.push({...o,date:l.date}); else if(n>=S.f1.cur||!l) todo.push(o); }); }
+  else if(f===2){ for(let s=1;s<=F2T();s++){ const l=S.f2.logs[s], o={lab:s%2?'A':'B',c:false};
+      if(l&&l.date) done.push({...o,date:l.date}); else todo.push(o);
+      if(s%3===0){ const w=s/3, c=S.cardio['2-'+w]||{}, d=Object.values(c).find(x=>x&&x.done);
+        if(d) done.push({lab:f2CardioKey(w).includes('LISS')?'LISS':'HIIT',c:true,date:d.date||''}); else todo.push({lab:f2CardioKey(w).includes('LISS')?'LISS':'HIIT',c:true}); } } }
+  else { const P=f===3?P3:P4, st=S[P.ph]; Object.entries(st.logs).forEach(([n,l])=>{ if(l.date){ const d=P.day(+n); done.push({lab:d.id.toUpperCase(),c:!!d.cardio,date:l.date}); } });
+    const tot=f===3?st.cur+19:16; for(let n=st.cur;n<=tot;n++){ const d=P.day(n); todo.push({lab:d.id.toUpperCase(),c:!!d.cardio,dayId:d.id}); } }
+  return {done,todo}; }
+function gapAfter(item,next){ const f=S.fase; if(!next) return 0;
+  if(f===1&&S.cfg.f1modo==='5d'){ return [1,2,1,1,2][item.pos%5]; }
+  if(f===3){ return {tf:1,pf:2,th:1,ph:1,po:2}[item.dayId]||1; }
+  if(next.c) return 1; return 2; }
+function lastTrained(done){ const d=done.map(x=>x.date).filter(Boolean).sort(); return d.length?d[d.length-1]:null; }
+let calRef=null;
+function renderPlan(){ const {done,todo}=phaseItems(); const t=todayIso();
+  let start=t; const last=lastTrained(done); if(last){ const st=addDays(last,todo[0]&&todo[0].c?1:2); if(st>start) start=st; }
+  if(S.cfg.resumeDate&&S.cfg.resumeDate>start) start=S.cfg.resumeDate;
+  const dmap={}; done.forEach(x=>{ if(x.date) dmap[x.date]=x; });
+  const pmap={}; let cur=start, end=null;
+  todo.forEach((x,i)=>{ while(dmap[cur]) cur=addDays(cur,1); pmap[cur]=x; end=cur; cur=addDays(cur,gapAfter(x,todo[i+1])); });
+  // días de regla previstos
+  const reg={}; const ci=cicloInfo(); if(ci&&!ci.anticon){ [...S.ciclo.starts, ci.next, addDays(ci.next,ci.len), addDays(ci.next,2*ci.len)].forEach(s=>{ for(let k=0;k<(+S.ciclo.regla||5);k++) reg[addDays(s,k)]=1; }); }
+  if(!calRef){ const d=new Date(); calRef=new Date(d.getFullYear(),d.getMonth(),1); }
+  const y=calRef.getFullYear(), m=calRef.getMonth(), wd=(new Date(y,m,1).getDay()+6)%7, dim=new Date(y,m+1,0).getDate();
+  let cells=''; for(let i=0;i<wd;i++) cells+='<div class="cal-cell empty"></div>';
+  for(let d=1;d<=dim;d++){ const iso=dateToIso(new Date(y,m,d)), r=dmap[iso], p=pmap[iso], x=r||p;
+    cells+=`<div class="cal-cell ${x?(x.c?'h':'f'):''} ${iso===t?'today':''}"><span class="cal-d">${d}</span>${x?`<span class="cal-lab">${x.lab}</span>`:''}${r?'<span class="cal-chk">✓</span>':''}${reg[iso]?'<span class="regla"></span>':''}</div>`; }
+  const week3=S.fase===3?`<p class="eyebrow" style="margin-top:16px">Semana tipo Fase III (pág. 252)</p><div class="wk">${[['Lun','Torso · Fuerza','tf'],['Mar','Pierna · Fuerza','pf'],['Mié','Descanso',''],['Jue','Torso · Hipertrofia','th'],['Vie','Pierna · Hipertrofia','ph'],['Sáb','Potencia + HIIT/LISS','po'],['Dom','Descanso','']].map(([a,b,id])=>`<div class="wkd ${id?'':'rest'} ${id&&P3.day(S.f3.cur).id===id?'now':''}"><span class="wkd-d">${a}</span><span class="wkd-n">${b}</span>${id&&P3.day(S.f3.cur).id===id?'<span class="wkd-tag">TOCA</span>':''}</div>`).join('')}</div>
+     <div class="note">El sábado (potencia) es flotante: si una semana no puedes, sáltalo. Puedes alargar esta fase mientras progreses.</div>`:'';
+  app.innerHTML=`<p class="eyebrow">Plan · Fase ${FASE_N[S.fase]}</p>
+    <div class="cal-head"><button class="cal-nav" id="cp">‹</button><h2 class="cond" style="font-size:22px;text-transform:capitalize;margin:0">${calRef.toLocaleDateString('es-ES',{month:'long',year:'numeric'})}</h2><button class="cal-nav" id="cn">›</button></div>
+    <div class="cal-grid cal-dow">${['L','M','X','J','V','S','D'].map(x=>`<div>${x}</div>`).join('')}</div><div class="cal-grid">${cells}</div>
+    <div class="cal-legend"><span class="lg" style="background:rgba(217,71,63,.45)"></span>Fuerza <span class="lg" style="background:rgba(230,184,103,.45)"></span>Quema-grasa <span class="lg" style="background:#e05a74;border-radius:50%;width:8px;height:8px"></span>Regla (prevista) · ✓ hecho</div>
+    <div class="card"><div class="card-body body-open">
+      <div class="field"><label>Próximo entrenamiento (cámbialo si te vas unos días)</label><input type="date" id="rd" value="${start}" min="${t}"></div>
+      <div class="stat-line">Pendientes${S.fase===3?' (próximas 4 semanas)':''}<b>${todo.length}</b></div>
+      ${S.fase!==3&&end?`<div class="stat-line">Fin estimado de fase<b>${formatEs(end)}</b></div>`:''}
+    </div></div>${week3}
+    <p class="tiny center">El plan se proyecta desde hoy y se recoloca solo. Nunca dos días de fuerza del mismo músculo seguidos (≥48 h, pág. 83).</p>`;
+  document.getElementById('cp').onclick=()=>{ calRef=new Date(y,m-1,1); renderPlan(); };
+  document.getElementById('cn').onclick=()=>{ calRef=new Date(y,m+1,1); renderPlan(); };
+  document.getElementById('rd').onchange=e=>{ S.cfg.resumeDate=e.target.value||null; save(); renderPlan(); toast('Calendario recolocado'); }; }
+
+/* ---------- HISTORIAL ---------- */
+let histTab=null;
+function renderHistorial(){ if(!histTab) histTab='f'+S.fase;
+  const tabs=[['f1','Fase I'],['f2','Fase II'],['f3','Fase III'],['f4','Fase IV'],['cardio','Quema-grasa']];
+  const rows=[];
+  if(histTab==='f1'){ const seq=f1Seq(); Object.entries(S.f1.logs).forEach(([n,l])=>{ if(!l.date) return; const it=seq[n-1]||{};
+      rows.push({date:l.date,t:it.t==='C'?'Quema-grasa · semana '+it.w:`Sesión ${it.t}${it.code} · semana ${it.w}`,sum:it.t==='C'?Object.entries(l.cardio||{}).map(([k,v])=>cardioSummary(k,v)).join(''):`${Object.keys(l.ex||{}).length} ejercicios`,
+        setD:v=>{l.date=v;},del:()=>{ delete S.f1.logs[n]; }}); }); }
+  if(histTab==='f2') Object.keys(S.f2.logs).map(Number).forEach(s=>{ const l=S.f2.logs[s]; if(!l.date) return;
+    rows.push({date:l.date,t:`Sesión ${s} · ${s%2?'A':'B'}${l.ligera?' · ligera':''}`,sum:sessionLifts(s).map(k=>`${LIFTS[k].label} ${sessionW(k,s)} kg${outOf(s,k).r==='fallo'?' ✗':outOf(s,k).r==='forzado'?' ●':''}`).join(' · '),
+      setD:v=>{l.date=v;},del:()=>{ delete S.f2.logs[s]; S.f2.cur=lastF2()+1; },edit:()=>{ S.f2.cur=s; S.fase=2; f2Mode='fuerza'; view='hoy'; }}); });
+  if(histTab==='f3'||histTab==='f4'){ const P=histTab==='f3'?P3:P4; Object.entries(S[P.ph].logs).forEach(([n,l])=>{ if(!l.date) return; const d=P.day(+n);
+      rows.push({date:l.date,t:`${d.name}${l.skipped?' · saltado':''}`,sum:Object.entries(l.ex||{}).filter(([id])=>DP_SPECS[id]).map(([id,e])=>`${DP_SPECS[id].label} ${e.w??''}kg ${(e.sets||[]).filter(x=>x!=='').join('·')}`).join(' · ')+Object.entries(l.cardio||{}).map(([k,v])=>v.done?' · '+CARDIO[k].tag+' '+cardioSummary(k,v):'').join(''),
+        setD:v=>{l.date=v;},del:()=>{ delete S[P.ph].logs[n]; },edit:()=>{ S[P.ph].cur=+n; S.fase=P.fase; view='hoy'; }}); }); }
+  if(histTab==='cardio') allCardioLogs().forEach(x=>rows.push({date:x.v.date||'',t:`${CARDIO[x.k].tag} · Fase ${x.fase}`,sum:cardioSummary(x.k,x.v),setD:v=>{x.v.date=v;},del:()=>{ x.v.done=false; }}));
+  rows.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  app.innerHTML=`<p class="eyebrow">Historial</p><div class="ntabs" id="ht">${tabs.map(([k,l])=>`<button data-h="${k}" class="${histTab===k?'sel':''}">${l}</button>`).join('')}</div>
+    ${rows.length?'':'<div class="note">Nada registrado aún aquí.</div>'}<div id="hl"></div>`;
+  document.querySelectorAll('#ht [data-h]').forEach(b=>b.onclick=()=>{ histTab=b.dataset.h; renderHistorial(); });
+  const hl=document.getElementById('hl');
+  rows.forEach(r=>{ const c=document.createElement('div'); c.className='card';
+    c.innerHTML=`<div class="card-head"><div class="left"><span class="ex-name" style="font-size:16px">${esc(r.t)}</span></div><span class="ex-scheme">${r.date?shortEs(r.date):''} <span class="chev">▶</span></span></div>
+      <div class="card-body"><p style="font-size:13px;color:var(--muted);margin:4px 0 10px">${esc(r.sum)||'—'}</p>
+      <div class="field"><label>Fecha</label><input type="date" value="${r.date}"></div>
+      <div class="btn-row">${r.edit?'<button class="btn ghost" data-e>Abrir / editar</button>':''}<button class="btn deep" data-d>Borrar</button></div></div>`;
+    c.querySelector('.card-head').onclick=()=>c.classList.toggle('open');
+    c.querySelector('input[type=date]').onchange=e=>{ r.setD(e.target.value); save(); toast('Fecha actualizada'); };
+    c.querySelector('[data-d]').onclick=()=>askConfirm('¿Borrar este registro? No se puede deshacer.',()=>{ r.del(); save(); renderHistorial(); toast('Borrado'); },'Borrar');
+    const e=c.querySelector('[data-e]'); if(e) e.onclick=()=>{ r.edit(); save(); render(); window.scrollTo(0,0); };
+    hl.appendChild(c); }); }
+
+/* ---------- PROGRESO ---------- */
+let progTab='std', progLift='sentadilla';
+function peso7d(){ const ds=Object.keys(S.body.daily).filter(d=>S.body.daily[d].peso>0).sort(); if(!ds.length) return +S.cfg.nutri.peso||null;
+  const last=ds[ds.length-1], v=ds.filter(d=>daysBetween(d,last)<=6).map(d=>S.body.daily[d].peso); return +(v.reduce((a,b)=>a+b,0)/v.length).toFixed(1); }
+function timeChart(svg,tip,series,o={}){ const all=series.flatMap(s=>s.pts); if(!all.length){ svg.innerHTML='<text x="172" y="118" fill="var(--faint)" font-size="11" text-anchor="middle" font-family="Inter">Sin datos aún</text>'; return; }
+  const xs=all.map(p=>p.x).sort(), x0=xs[0], x1=xs[xs.length-1], span=Math.max(1,daysBetween(x0,x1));
+  let ys=all.map(p=>p.y); if(o.hline!=null) ys.push(o.hline); if(o.band) ys.push(...o.band);
+  let lo=Math.min(...ys), hi=Math.max(...ys); const pad=(hi-lo)*0.1||2; lo-=pad; hi+=pad;
+  const W=344,H=236,mL=38,mR=12,mT=14,mB=24,X=d=>mL+(W-mL-mR)*daysBetween(x0,d)/span,Y=v=>H-mB-(H-mT-mB)*(v-lo)/(hi-lo);
+  let g=''; for(let i=0;i<=4;i++){ const v=lo+(hi-lo)*i/4, yy=Y(v).toFixed(1); g+=`<line x1="${mL}" y1="${yy}" x2="${W-mR}" y2="${yy}" stroke="var(--line)" stroke-width=".7"/><text x="${mL-5}" y="${+yy+3}" fill="var(--faint)" font-size="9" text-anchor="end" font-family="Inter">${v>=100?Math.round(v):+v.toFixed(1)}</text>`; }
+  if(o.band) g+=`<rect x="${mL}" y="${Y(o.band[1]).toFixed(1)}" width="${W-mL-mR}" height="${(Y(o.band[0])-Y(o.band[1])).toFixed(1)}" fill="rgba(75,174,110,.12)"/>`;
+  if(o.hline!=null){ const hy=Y(o.hline).toFixed(1); g+=`<line x1="${mL}" y1="${hy}" x2="${W-mR}" y2="${hy}" stroke="#4bae6e" stroke-width="1.5" stroke-dasharray="5 3"/><text x="${W-mR-2}" y="${hy-4}" fill="#4bae6e" font-size="9" font-weight="700" text-anchor="end" font-family="Inter">${o.hlabel||''}</text>`; }
+  const path=pts=>pts.map((p,i)=>`${i?'L':'M'}${X(p.x).toFixed(1)},${Y(p.y).toFixed(1)}`).join(' ');
+  series.forEach(s=>{ if(!s.pts.length) return; g+=`<path d="${path(s.pts)}" fill="none" stroke="${s.color||'var(--accent)'}" stroke-width="${s.w||2.2}" ${s.dash?'stroke-dasharray="4 3"':''} stroke-linejoin="round"/>`;
+    if(s.dots!==false) g+=s.pts.map(p=>`<circle cx="${X(p.x).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="2.6" fill="${s.color||'var(--warm)'}"/>`).join(''); });
+  g+=`<text x="${mL}" y="${H-8}" fill="var(--faint)" font-size="9" font-family="Inter">${shortEs(x0)}</text><text x="${W-mR}" y="${H-8}" fill="var(--faint)" font-size="9" text-anchor="end" font-family="Inter">${shortEs(x1)}</text>
+     <line id="${svg.id}x" x1="0" y1="${mT}" x2="0" y2="${H-mB}" stroke="var(--warm)" opacity="0"/>`;
+  svg.innerHTML=g; const main=series[0].pts.length?series[0].pts:all;
+  const at=cx=>{ const r=svg.getBoundingClientRect(), vx=(cx-r.left)/r.width*W; let b=main[0],bd=1e9; main.forEach(p=>{ const d=Math.abs(X(p.x)-vx); if(d<bd){bd=d;b=p;} });
+    const l=document.getElementById(svg.id+'x'); l.setAttribute('x1',X(b.x)); l.setAttribute('x2',X(b.x)); l.setAttribute('opacity','.5');
+    if(tip){ tip.innerHTML=`${shortEs(b.x)} · <b>${b.y} ${o.unit||''}</b>${b.lab?' '+b.lab:''}`; tip.style.opacity=1; tip.style.left=Math.min(80,Math.max(15,X(b.x)/W*100))+'%'; } };
+  const hide=()=>{ const l=document.getElementById(svg.id+'x'); if(l) l.setAttribute('opacity','0'); if(tip) tip.style.opacity=0; };
+  svg.onpointerdown=e=>at(e.clientX); svg.onpointermove=e=>{ if(e.buttons||e.pointerType==='touch') at(e.clientX); }; svg.onpointerup=hide; svg.onpointerleave=e=>{ if(!e.buttons) hide(); }; }
+function rmHistory(base){ const pts=[];
+  if(LIFTS[base]) for(let s=1;s<=F2T();s++) if(appearsIn(base,s)&&f2Logged(s)&&!S.f2.logs[s].ligera&&outOf(s,base).r!=='fallo') pts.push({x:S.f2.logs[s].date,y:+(sessionW(base,s)*EP(LIFTS[base].reps)).toFixed(1),lab:'(F2)'});
+  ['f3','f4'].forEach(ph=>Object.values(S[ph].logs).forEach(l=>{ if(!l.date||!l.ex) return; Object.entries(l.ex).forEach(([id,e])=>{ const sp=DP_SPECS[id]; if(sp&&sp.base===base){ const v=best1RMFromLog(e.w,e.sets); if(v) pts.push({x:l.date,y:+v.toFixed(1),lab:`(F${ph[1]})`}); } }); }));
+  return pts.sort((a,b)=>a.x.localeCompare(b.x)); }
+function renderProgreso(){ const tabs=[['std','Estándares'],['rm','1RM estimado'],['f1','Fase I'],['cardio','Quema-grasa']];
+  let html=`<p class="eyebrow">Progreso</p><h2 class="h-big" style="font-size:24px">La barra no miente</h2><p class="sub">Tu principal indicador es la fuerza, no la báscula (pág. 22).</p>
+    <div class="ntabs" id="pt">${tabs.map(([k,l])=>`<button data-p="${k}" class="${progTab===k?'sel':''}">${l}</button>`).join('')}</div><div id="pb"></div>`;
+  app.innerHTML=html; document.querySelectorAll('#pt [data-p]').forEach(b=>b.onclick=()=>{ progTab=b.dataset.p; renderProgreso(); });
+  const pb=document.getElementById('pb'); const bw=peso7d();
+  if(progTab==='std'){ if(!bw){ pb.innerHTML='<div class="note">Registra tu <b>peso</b> en Cuerpo para comparar con los estándares del libro.</div>'; return; }
+    const rows=Object.keys(STD).map(k=>{ const tgt=bw*STD[k], cur=est1RM(k)||0, ini=startWork(k)*EP(5);
+      return {k,tgt,cur,ini,camino:tgt>ini?Math.max(0,Math.min(100,(cur-ini)/(tgt-ini)*100)):100,sobre:Math.min(130,cur/tgt*100)}; });
+    const all=rows.every(r=>r.cur>=r.tgt);
+    pb.innerHTML=`<div class="note ${all?'ok':''}">Estándar mínimo para dejar de ser <b>novata</b> (1RM × tu peso de ${bw} kg, pág. 79). ${all?'<b>¡Los superas todos!</b> Si además te estancas tras una descarga, es tu señal para la Fase III.':''}</div>
+      <div class="ov-wrap">${rows.map(r=>`<div class="ov-row ${progLift===r.k?'cur':''}" data-k="${r.k}"><div class="ov-head"><span class="ov-name">${LIFTS[r.k].label}</span><span class="ov-pcts">${Math.round(r.sobre)}%${r.cur>=r.tgt?' ✓':''}</span></div>
+        <div class="ov-bar"><div class="ov-fill" style="width:${Math.min(100,r.sobre)}%"></div></div>
+        <div class="ov-sub">1RM estimado <b>${r.cur.toFixed(1)} kg</b> · estándar ${r.tgt.toFixed(1)} kg (${STD[r.k]}×)</div></div>`).join('')}</div>
+      <p class="tiny" style="margin-top:8px">1RM estimado desde tu peso de trabajo con la fórmula del libro (peso × (1 + reps × 0,0333)). El tren superior progresa más despacio: es normal (pág. 240).</p>
+      <p class="eyebrow" style="margin-top:16px">${LIFTS[progLift]?LIFTS[progLift].label:''} · Fase II sesión a sesión</p>
+      <div class="chart-wrap"><svg class="chart" id="c2" viewBox="0 0 344 236"></svg><div class="chart-tip" id="c2t"></div></div>
+      <div class="chart-legend"><span class="lg-line" style="border-color:var(--accent)"></span>peso de trabajo <span class="lg-line" style="border-color:var(--faint);border-top-style:dashed"></span>previsto <span class="lg-line" style="border-color:#4bae6e;border-top-style:dashed"></span>estándar (en peso de trabajo)</div>`;
+    pb.querySelectorAll('[data-k]').forEach(r=>r.onclick=()=>{ progLift=r.dataset.k; renderProgreso(); });
+    if(!LIFTS[progLift]||!STD[progLift]) progLift='sentadilla';
+    const svg=document.getElementById('c2'); const pts=[]; let proj=0;
+    for(let s=1;s<=F2T();s++){ if(!appearsIn(progLift,s)) continue; const d=f2Logged(s); pts.push({s,w:d?sessionW(progLift,s):workWeight(progLift,s),d}); if(!d&&++proj>=8) break; }
+    const tgtW=bw*STD[progLift]/EP(5); const W=344,H=236,mL=38,mR=12,mT=14,mB=24; const ys=[...pts.map(p=>p.w),tgtW]; let lo=Math.min(...ys)-3,hi=Math.max(...ys)+3;
+    const X=i=>mL+(W-mL-mR)*(pts.length>1?i/(pts.length-1):.5), Y=v=>H-mB-(H-mT-mB)*(v-lo)/(hi-lo);
+    let g=''; for(let i=0;i<=4;i++){ const v=lo+(hi-lo)*i/4, yy=Y(v).toFixed(1); g+=`<line x1="${mL}" y1="${yy}" x2="${W-mR}" y2="${yy}" stroke="var(--line)" stroke-width=".7"/><text x="${mL-5}" y="${+yy+3}" fill="var(--faint)" font-size="9" text-anchor="end" font-family="Inter">${Math.round(v)}</text>`; }
+    g+=`<line x1="${mL}" y1="${Y(tgtW)}" x2="${W-mR}" y2="${Y(tgtW)}" stroke="#4bae6e" stroke-dasharray="5 3" stroke-width="1.5"/><text x="${W-mR-2}" y="${Y(tgtW)-4}" fill="#4bae6e" font-size="9" font-weight="700" text-anchor="end" font-family="Inter">Estándar ≈ ${tgtW.toFixed(1)} kg ×5</text>`;
+    const dn=pts.filter(p=>p.d); g+=`<path d="${pts.map((p,i)=>`${i?'L':'M'}${X(i)},${Y(p.w)}`).join(' ')}" fill="none" stroke="var(--faint)" stroke-dasharray="4 3" stroke-width="1.5"/>`;
+    g+=`<path d="${pts.map((p,i)=>p.d?`${dn.indexOf(p)?'L':'M'}${X(i)},${Y(p.w)}`:'').join(' ')}" fill="none" stroke="var(--accent)" stroke-width="2.4"/>`;
+    g+=pts.map((p,i)=>`<circle cx="${X(i)}" cy="${Y(p.w)}" r="${p.d?3.2:2}" fill="${p.d?'var(--warm)':'var(--faint)'}"/>`).join('');
+    if(pts.length) g+=`<text x="${mL}" y="${H-8}" fill="var(--faint)" font-size="9" font-family="Inter">S${pts[0].s}</text><text x="${W-mR}" y="${H-8}" fill="var(--faint)" font-size="9" text-anchor="end" font-family="Inter">S${pts[pts.length-1].s}</text>`;
+    svg.innerHTML=g; const tip=document.getElementById('c2t');
+    svg.onpointerdown=svg.onpointermove=e=>{ if(e.type==='pointermove'&&!e.buttons&&e.pointerType!=='touch') return; const r=svg.getBoundingClientRect(), vx=(e.clientX-r.left)/r.width*W; let bi=0,bd=1e9; pts.forEach((p,i)=>{ const d=Math.abs(X(i)-vx); if(d<bd){bd=d;bi=i;} });
+      const p=pts[bi]; if(!p) return; tip.innerHTML=`Sesión ${p.s} · <b>${p.w} kg</b>${p.d?' ✓':' (previsto)'}`; tip.style.opacity=1; tip.style.left=Math.min(80,Math.max(15,X(bi)/W*100))+'%'; };
+    svg.onpointerup=svg.onpointerleave=()=>tip.style.opacity=0; return; }
+  if(progTab==='rm'){ const bases=Object.keys(BASE_LABEL).filter(b=>rmHistory(b).length||STD[b]); if(!bases.includes(progLift)) progLift=bases[0]||'sentadilla';
+    const pts=rmHistory(progLift); const tgt=bw&&STD[progLift]?+(bw*STD[progLift]).toFixed(1):null;
+    pb.innerHTML=`<div class="progress-pick" id="lp">${bases.map(b=>`<button data-b="${b}" class="${b===progLift?'sel':''}">${BASE_LABEL[b]}</button>`).join('')}</div>
+      <div class="chart-wrap"><svg class="chart" id="c3" viewBox="0 0 344 236"></svg><div class="chart-tip" id="c3t"></div></div>
+      <p class="tiny" style="margin-top:6px">Une las tres fases en una misma escala: el 1RM estimado de cada sesión (mejor serie). Así 3×5 y 4×8-10 son comparables.</p>
+      ${pts.length?`<div class="stat-line">Último 1RM estimado<b>${pts[pts.length-1].y} kg</b></div><div class="stat-line">Mejor<b>${Math.max(...pts.map(p=>p.y))} kg</b></div><div class="stat-line">Desde el inicio<b>${(pts[pts.length-1].y-pts[0].y>=0?'+':'')+(pts[pts.length-1].y-pts[0].y).toFixed(1)} kg</b></div>`:''}`;
+    pb.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{ progLift=b.dataset.b; renderProgreso(); });
+    timeChart(document.getElementById('c3'),document.getElementById('c3t'),[{pts}],{unit:'kg',hline:tgt,hlabel:tgt?`Estándar ${tgt}`:''}); return; }
+  if(progTab==='f1'){ const map={}; const seq=f1Seq(); Object.entries(S.f1.logs).forEach(([n,l])=>{ if(!l.date||!l.ex) return; const it=seq[n-1]; if(!it||it.t==='C') return;
+      F1[it.t][it.code].forEach(sp=>{ const v=l.ex[sp.id]; if(!v) return; const key=sp.label.split(' (')[0]; const sc=bwScore(sp,v); if(!map[key]||sc>map[key].sc) map[key]={sc,txt:bwText(sp,v),date:l.date}; }); });
+    const ks=Object.keys(map); pb.innerHTML=ks.length?ks.map(k=>`<div class="stat-line">${esc(k)}<b>${esc(map[k].txt)}</b></div>`).join('')+'<p class="tiny">Mejor marca por ejercicio (nivel primero, luego repeticiones). En esta fase se progresa subiendo de nivel cada semana (pág. 219).</p>':'<div class="note">Sin sesiones de Fase I registradas.</div>'; return; }
+  const byKey={}; allCardioLogs().forEach(x=>{ (byKey[x.k]=byKey[x.k]||[]).push(x.v); });
+  pb.innerHTML=Object.keys(byKey).length?Object.entries(byKey).map(([k,ls])=>`<div class="card open"><div class="card-head"><span class="ex-name" style="font-size:16px">${CARDIO[k].tag}</span><span class="ex-scheme">${ls.length}×</span></div><div class="card-body">${ls.sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(v=>`<div class="stat-line"><span>${v.date?shortEs(v.date):'—'}</span><b>${esc(cardioSummary(k,v))||'✓'}</b></div>`).join('')}</div></div>`).join(''):'<div class="note">Aún no hay sesiones HIIT/LISS.</div>'; }
+
+/* ---------- CUERPO ---------- */
+let bodyTab='registro', bodyDate=null;
+const jp3Mujer=(tri,sup,mus,ed)=>{ const s=tri+sup+mus, D=1.0994921-0.0009929*s+0.0000023*s*s-0.0001392*ed; return +((495/D)-450).toFixed(1); };
+function grasaActual(){ const c=Object.keys(S.body.calipers).sort().pop(); if(c) return {v:S.body.calipers[c].grasa,src:'plicómetro',date:c};
+  const d=Object.keys(S.body.daily).filter(x=>S.body.daily[x].grasa>0).sort().pop(); if(d) return {v:S.body.daily[d].grasa,src:'báscula',date:d};
+  return S.cfg.nutri.grasa?{v:+S.cfg.nutri.grasa,src:'dato inicial'}:null; }
+function ratioCC(){ const ds=Object.keys(S.body.perim).filter(d=>S.body.perim[d].cintura&&S.body.perim[d].cadera).sort(); if(!ds.length) return null;
+  const p=S.body.perim[ds[ds.length-1]], r=p.cintura/p.cadera; return {r,bio:r>0.8?'manzana':r<0.75?'pera':'esparrago',date:ds[ds.length-1]}; }
+function renderCuerpo(){ bodyDate=bodyDate||todayIso(); const tabs=[['registro','Registro'],['comp','Composición'],['medidas','Medidas'],['ciclo','Ciclo']];
+  app.innerHTML=`<p class="eyebrow">Cuerpo</p><h2 class="h-big" style="font-size:24px">Tu diario del cuerpo</h2>
+    <div class="ntabs" id="bt">${tabs.map(([k,l])=>`<button data-b="${k}" class="${bodyTab===k?'sel':''}">${l}</button>`).join('')}</div><div id="bb"></div>`;
+  document.querySelectorAll('#bt [data-b]').forEach(b=>b.onclick=()=>{ bodyTab=b.dataset.b; renderCuerpo(); });
+  const bb=document.getElementById('bb'); ({registro:bodyReg,comp:bodyComp,medidas:bodyMed,ciclo:bodyCiclo}[bodyTab])(bb); wireRegla(); }
+function bodyReg(bb){ const d=S.body.daily[bodyDate]||{}; const F=(k,l,u)=>`<div class="field"><label>${l}${u?' ('+u+')':''}</label><input type="number" inputmode="decimal" data-d="${k}" value="${d[k]??''}"></div>`;
+  const pts=Object.keys(S.body.daily).filter(x=>S.body.daily[x].peso>0).sort().map(x=>({x,y:S.body.daily[x].peso}));
+  const ma=pts.map((p,i)=>{ const w=pts.filter(q=>q.x<=p.x&&daysBetween(q.x,p.x)<=6); return {x:p.x,y:+(w.reduce((a,b)=>a+b.y,0)/w.length).toFixed(1)}; });
+  bb.innerHTML=`${pts.length?`<div class="stat-line">Peso · media 7 días<b>${peso7d()} kg</b></div><div class="chart-wrap"><svg class="chart" id="cw" viewBox="0 0 344 236"></svg><div class="chart-tip" id="cwt"></div></div>
+     <div class="chart-legend"><span class="lg-line" style="border-color:var(--accent)"></span>media 7 días <span class="lg-line" style="border-color:var(--faint)"></span>diario</div>`:''}
+    <div class="note">La báscula fluctúa con el agua y tu ciclo (sobre todo final de fase lútea): mira la tendencia, no el día. No te peses el día después de una recarga (pág. 202).</div>
+    <div class="field"><label>Día</label><input type="date" id="bd" value="${bodyDate}" max="${todayIso()}"></div>
+    <div class="grid2">${F('peso','Peso','kg')}${F('grasa','% grasa báscula','%')}${F('fcRep','FC reposo','lpm')}${F('hrv','HRV','ms')}${F('sueno','Sueño','h')}${F('pasos','Pasos','')}</div>
+    <button class="btn" id="bs">Guardar el día</button>`;
+  if(pts.length) timeChart(document.getElementById('cw'),document.getElementById('cwt'),[{pts:ma,dots:false},{pts,color:'var(--faint)',w:1}],{unit:'kg'});
+  document.getElementById('bd').onchange=e=>{ bodyDate=e.target.value; renderCuerpo(); };
+  document.getElementById('bs').onclick=()=>{ const o={...(S.body.daily[bodyDate]||{})}; bb.querySelectorAll('[data-d]').forEach(i=>{ const v=i.value.trim(); if(v==='') delete o[i.dataset.d]; else o[i.dataset.d]=+v; });
+    if(Object.keys(o).length) S.body.daily[bodyDate]=o; else delete S.body.daily[bodyDate]; if(o.peso) S.cfg.nutri.peso=peso7d(); save(); toast('Día guardado'); renderCuerpo(); }; }
+function bodyComp(bb){ const g=grasaActual(), p=peso7d();
+  const cal=Object.keys(S.body.calipers).sort().map(x=>({x,y:S.body.calipers[x].grasa,lab:'(plicómetro)'}));
+  const imp=Object.keys(S.body.daily).filter(x=>S.body.daily[x].grasa>0).sort().map(x=>({x,y:S.body.daily[x].grasa,lab:'(báscula)'}));
+  let sug=''; if(g){ const v=g.v; sug=v>26?'Por encima del 25-26%: empieza perdiendo grasa (bloque de definición o El Plan Revolucionario) — pág. 164.'
+     :v>=25?'En el techo del rango: toca <b>definición</b> (−15-20%, 4-6 semanas máx).':v>=20?'Dentro del rango 20-25%: mantén la dirección (volumen hasta ~25%, definición hasta ~20%) o mantenimiento si te gusta lo que ves (pág. 194).'
+     :v>=16?'Por debajo del 20%: buen momento para <b>volumen</b> o mantenimiento. La definición máxima apunta a 16-18% y solo puntualmente.':'⚠️ Por debajo del 16%: no presiones más. Si notas cambios en tu ciclo, sube la energía (pág. 198).'; }
+  bb.innerHTML=`<div class="chart-wrap"><svg class="chart" id="cg" viewBox="0 0 344 236"></svg><div class="chart-tip" id="cgt"></div></div>
+    <div class="chart-legend"><span class="lg-line" style="border-color:var(--accent)"></span>plicómetro <span class="lg-line" style="border-color:var(--faint);border-top-style:dashed"></span>báscula <span class="lg" style="background:rgba(75,174,110,.3);width:14px;height:10px;display:inline-block"></span>rango 20-25%</div>
+    ${p?`<div class="stat-line">Peso (media 7 días)<b>${p} kg</b></div>`:''}
+    ${g?`<div class="stat-line">% grasa (${g.src})<b>${g.v}%</b></div>${p?`<div class="stat-line">Masa grasa · masa magra<b>${(p*g.v/100).toFixed(1)} · ${(p*(1-g.v/100)).toFixed(1)} kg</b></div>`:''}<div class="note ${g.v<16?'warn':''}">${sug}</div>`:'<div class="note">Sin % de grasa. Mídelo con plicómetro en Medidas (más fiable que la báscula) o anótalo en Registro.</div>'}
+    <div class="note">Óptimo saludable y estético para la mayoría: 18-22%. Grasa esencial 10-12%, pero acercarse genera problemas menstruales (pág. 35).</div>`;
+  timeChart(document.getElementById('cg'),document.getElementById('cgt'),[{pts:cal.length?cal:imp},{pts:cal.length?imp:[],color:'var(--faint)',dash:true,w:1.2}],{unit:'%',band:[20,25]}); }
+function bodyMed(bb){ const t=todayIso(); const lc=Object.keys(S.body.calipers).sort().pop(), c=lc?S.body.calipers[lc]:{}; const lp=Object.keys(S.body.perim).sort().pop(), pp=lp?S.body.perim[lp]:{};
+  const rc=ratioCC(); const per=[['cintura','Cintura (ombligo)'],['cadera','Cadera (mitad glúteo)'],['muslo','Muslo'],['brazo','Brazo'],['pecho','Pecho'],['hombros','Hombros']];
+  const cin=Object.keys(S.body.perim).filter(d=>S.body.perim[d].cintura).sort().map(x=>({x,y:S.body.perim[x].cintura}));
+  bb.innerHTML=`<p class="eyebrow">Biotipo · cintura/cadera (pág. 50)</p>
+    ${rc?`<div class="stat-line">Ratio cintura/cadera<b>${rc.r.toFixed(2)} → ${BIO[rc.bio].ico} ${BIO[rc.bio].n}</b></div>`:''}
+    ${bioPickHTML()}${S.cfg.biotipo?`<div class="help">${BIO[S.cfg.biotipo].tips.map(x=>'• '+x).join('<br>')}</div>`:''}
+    <p class="eyebrow" style="margin-top:18px">Perímetros (cm)</p><div class="field"><label>Fecha</label><input type="date" id="pd" value="${t}" max="${t}"></div>
+    <div class="grid2">${per.map(([k,l])=>`<div class="field"><label>${l}</label><input type="number" inputmode="decimal" data-p="${k}" value="${pp[k]??''}"></div>`).join('')}</div>
+    <button class="btn" id="ps">Guardar perímetros</button>
+    ${cin.length>1?`<div class="chart-wrap" style="margin-top:12px"><svg class="chart" id="cc" viewBox="0 0 344 236"></svg><div class="chart-tip" id="cct"></div></div><p class="tiny">Cintura: tu termómetro de grasa más continuo.</p>`:''}
+    <p class="eyebrow" style="margin-top:18px">Plicometría · Jackson-Pollock 3 (mujer)</p>
+    <p class="tiny">Tríceps, suprailíaco y muslo, en mm. Fórmula JP3 femenina + Siri (método estándar; el libro remite a su artículo para estimar el % de grasa).</p>
+    <div class="field"><label>Fecha</label><input type="date" id="cd" value="${t}" max="${t}"></div>
+    <div class="grid2"><div class="field"><label>Tríceps</label><input type="number" inputmode="decimal" id="c1" value="${c.tri??''}"></div><div class="field"><label>Suprailíaco</label><input type="number" inputmode="decimal" id="c2i" value="${c.sup??''}"></div>
+      <div class="field"><label>Muslo</label><input type="number" inputmode="decimal" id="c3i" value="${c.mus??''}"></div><div class="field"><label>% grasa</label><input type="text" id="cr" disabled value="${c.grasa?c.grasa+'%':''}"></div></div>
+    <button class="btn" id="cs">Guardar plicometría</button>`;
+  wireBioPick();
+  if(cin.length>1) timeChart(document.getElementById('cc'),document.getElementById('cct'),[{pts:cin}],{unit:'cm'});
+  const calc=()=>{ const a=+document.getElementById('c1').value,b=+document.getElementById('c2i').value,m=+document.getElementById('c3i').value, e=+S.cfg.nutri.edad||30;
+    if(a>0&&b>0&&m>0){ const v=jp3Mujer(a,b,m,e); document.getElementById('cr').value=v+'%'; return {tri:a,sup:b,mus:m,grasa:v}; } return null; };
+  ['c1','c2i','c3i'].forEach(id=>document.getElementById(id).addEventListener('input',calc));
+  document.getElementById('cs').onclick=()=>{ const v=calc(); if(!v) return toast('Rellena los 3 pliegues'); if(!S.cfg.nutri.edad) toast('Sin edad: uso 30 años'); S.body.calipers[document.getElementById('cd').value]=v; save(); toast(`Plicometría: ${v.grasa}%`); renderCuerpo(); };
+  document.getElementById('ps').onclick=()=>{ const d=document.getElementById('pd').value, o={...(S.body.perim[d]||{})}; bb.querySelectorAll('[data-p]').forEach(i=>{ const v=i.value.trim(); if(v==='') delete o[i.dataset.p]; else o[i.dataset.p]=+v; });
+    if(Object.keys(o).length) S.body.perim[d]=o; else delete S.body.perim[d]; save(); toast('Perímetros guardados'); renderCuerpo(); }; }
+function bodyCiclo(bb){ const ci=cicloInfo(), t=todayIso(), f=S.body.feel[t]||{};
+  const sc=(k,l)=>`<div class="field"><label>${l}</label><div class="feel">${[1,2,3,4,5].map(n=>`<button data-fk="${k}" data-fv="${n}" class="${f[k]==n?'sel':''}">${n}</button>`).join('')}</div></div>`;
+  const agg={}; Object.entries(S.body.feel).forEach(([d,v])=>{ if(!v.fase) return; const a=agg[v.fase]=agg[v.fase]||{n:0,energia:0,apetito:0,molestias:0}; a.n++; ['energia','apetito','molestias'].forEach(k=>a[k]+=(+v[k]||0)); });
+  bb.innerHTML=`${cicloBannerHTML(false)}
+    <div class="card"><div class="card-body body-open"><p class="eyebrow">Ajustes del ciclo</p>
+      <div class="grid2"><div class="field"><label>Duración (si no hay histórico)</label><input type="number" id="cl" value="${S.ciclo.len}"></div><div class="field"><label>Días de regla</label><input type="number" id="cr2" value="${S.ciclo.regla}"></div></div>
+      <label class="alt-toggle"><input type="checkbox" id="ca" ${S.ciclo.anticon?'checked':''}> Anticonceptivos hormonales</label>
+      ${ci&&!ci.anticon?`<div class="stat-line">Duración media calculada<b>${ci.len} días</b></div><div class="stat-line">Próxima regla estimada<b>${formatEs(ci.next)}</b></div>`:''}
+      <div class="acc-input" style="margin-top:8px"><span>Añadir inicio de regla</span><input type="date" id="cadd" max="${t}" style="width:auto"><button class="btn ghost sm" id="caddb">Añadir</button></div>
+      <div>${[...S.ciclo.starts].sort().reverse().slice(0,8).map(s=>`<div class="stat-line"><span>${formatEs(s)}</span><button class="btn ghost sm" data-del="${s}">✕</button></div>`).join('')}</div></div></div>
+    <div class="card"><div class="card-body body-open"><p class="eyebrow">Cómo te sientes hoy${ci&&ci.fase?' · '+CICLO_TXT[ci.fase].n:''}</p>
+      <p class="tiny">El libro recomienda anotar apetito, energía y molestias en cada fase para conocer tu patrón (pág. 45).</p>
+      ${sc('energia','Energía')}${sc('apetito','Apetito')}${sc('molestias','Molestias')}
+      <div class="field"><label>Nota</label><input type="text" id="fn" value="${esc(f.nota||'')}" placeholder="Antojos, sueño, cómo fue el entreno…"></div></div></div>
+    ${Object.keys(agg).length?`<p class="eyebrow">Tu patrón (media por fase)</p>${Object.entries(agg).map(([k,a])=>`<div class="stat-line"><span>${CICLO_TXT[k].n} <span class="tiny">(${a.n} días)</span></span><b>⚡${(a.energia/a.n).toFixed(1)} 🍽${(a.apetito/a.n).toFixed(1)} 🤕${(a.molestias/a.n).toFixed(1)}</b></div>`).join('')}`:''}`;
+  const sf=()=>{ const o=S.body.feel[t]=S.body.feel[t]||{}; o.fase=ci&&ci.fase?ci.fase:null; return o; };
+  bb.querySelectorAll('[data-fk]').forEach(b=>b.onclick=()=>{ const o=sf(); o[b.dataset.fk]=+b.dataset.fv; save(); bb.querySelectorAll(`[data-fk="${b.dataset.fk}"]`).forEach(x=>x.classList.toggle('sel',x===b)); });
+  document.getElementById('fn').onchange=e=>{ sf().nota=e.target.value; save(); };
+  document.getElementById('cl').onchange=e=>{ S.ciclo.len=+e.target.value||28; save(); renderCuerpo(); };
+  document.getElementById('cr2').onchange=e=>{ S.ciclo.regla=+e.target.value||5; save(); renderCuerpo(); };
+  document.getElementById('ca').onchange=e=>{ S.ciclo.anticon=e.target.checked; save(); renderCuerpo(); };
+  document.getElementById('caddb').onclick=()=>{ const v=document.getElementById('cadd').value; if(v&&!S.ciclo.starts.includes(v)){ S.ciclo.starts.push(v); S.ciclo.starts.sort(); save(); renderCuerpo(); } };
+  bb.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ S.ciclo.starts=S.ciclo.starts.filter(x=>x!==b.dataset.del); save(); renderCuerpo(); }); }
+
+/* ---------- DIETA (pág. 163-207 y alimentación de cada fase) ---------- */
+let nutPhase=null, nutDay='entreno';
+function macros(kcal,P,CH){ const G=Math.max(0,Math.round((kcal-P*4-CH*4)/9)); return {P:Math.round(P),CH:Math.round(CH),G,gp:Math.round(G*9/kcal*100)}; }
+function nutCalc(){ const n=S.cfg.nutri, ed=+n.edad, al=+n.altura, pe=+n.peso||peso7d(), gr=+n.grasa; if(!(ed>0&&al>0&&pe>0)) return null;
+  const mif=10*pe+6.25*al-5*ed-161; let tmb=mif, met='Harris-Benedict (Mifflin-St Jeor, mujer)';
+  if(gr>0&&gr<60){ const kat=370+21.6*pe*(1-gr/100); tmb=(mif+kat)/2; met='media Mifflin + Katch-McArdle'; }
+  const mant=tmb*1.55, bio=S.cfg.biotipo, man=bio==='manzana', rest=nutDay==='descanso';
+  const mPct={manzana:[25,35],pera:[22,45],esparrago:[22,43]}[bio]||[22,40];
+  const blocks=[
+    {k:'mant',n:'Mantenimiento',s:`P ${mPct[0]}% · CH ${mPct[1]}% · resto grasa`,kcal:mant,m:macros(mant,mant*mPct[0]/100/4,mant*mPct[1]/100/4)},
+    {k:'vol',n:'Volumen',s:'+10% · P 1,8-2 g/kg · CH 3-5 g/kg',kcal:mant*1.10*(rest?0.875:1),m:null,P:1.9*pe,CH:(rest?(man?3:3.5):(man?3.5:4.5))*pe},
+    {k:'def',n:'Definición',s:'−15-20% · P 2-2,2 g/kg · CH 2-4 g/kg · 4-6 sem máx',kcal:mant*0.825,P:2.1*pe,CH:(rest?2:(man?2.5:3))*pe},
+    {k:'max',n:'Definición máxima',s:'−30% · P 2-2,3 g/kg (comida real) · CH ~1 g/kg · grasa 40-60%',kcal:mant*0.70,P:2.15*pe,CH:1*pe},
+    {k:'rec',n:'Día de recarga',s:'+10-15% sobre mantenimiento · CH 50-60% · grasa baja',kcal:mant*1.125,P:2.1*pe,CH:mant*1.125*0.55/4}];
+  blocks.forEach(b=>{ if(!b.m) b.m=macros(b.kcal,b.P,b.CH); });
+  return {tmb,met,mant,pe,blocks}; }
+function renderDieta(){ if(!nutPhase) nutPhase=String(S.fase); const n=S.cfg.nutri; const g=grasaActual();
+  if(!n.peso&&peso7d()) n.peso=peso7d(); if(!n.grasa&&g) n.grasa=g.v;
+  const r=nutCalc(); const ci=cicloInfo();
+  app.innerHTML=`<p class="eyebrow">Alimentación · Guerrera Espartana</p><h2 class="h-big" style="font-size:24px">Come mejor, no menos</h2>
+    <p class="sub">El objetivo es un <b>flujo de energía alto</b>: comer y entrenar más, como una atleta, no como una modelo a 1.200 kcal (pág. 179). Asume que partes de ≤25-26% de grasa.</p>
+    <div class="pyr"><div style="width:40%">Suplementos</div><div style="width:55%">Frecuencia de comidas</div><div style="width:70%">Macronutrientes</div><div style="width:85%">Calorías</div><div style="width:100%;background:rgba(75,174,110,.15)">Alimentos de calidad (transversal)</div></div>
+    <p class="eyebrow" style="margin-top:16px">Tus números</p>
+    <div class="card"><div class="card-body body-open"><div class="grid2">
+      <div class="field"><label>Edad</label><input type="number" data-n="edad" value="${n.edad||''}"></div><div class="field"><label>Altura (cm)</label><input type="number" data-n="altura" value="${n.altura||''}"></div>
+      <div class="field"><label>Peso (kg)</label><input type="number" data-n="peso" value="${n.peso||''}"></div><div class="field"><label>% grasa (opc.)</label><input type="number" data-n="grasa" value="${n.grasa||''}"></div></div>
+      ${bioPickHTML()}
+      <div class="seg" id="nd" style="margin-top:10px"><button data-d="entreno" class="${nutDay==='entreno'?'sel':''}">Día de entreno</button><button data-d="descanso" class="${nutDay==='descanso'?'sel':''}">Día de descanso</button></div>
+      <div id="nout">${r?`<div class="res-row"><div class="rn">Metabolismo basal<small>${r.met}</small></div><div class="kcal">${Math.round(r.tmb)}</div></div>
+        ${r.blocks.map(b=>`<div class="res-row ${b.k==='rec'?'rec':''}"><div class="rn">${b.n}<small>${b.s}</small></div><div><div class="kcal">${Math.round(b.kcal)} kcal</div><div class="macros">P ${b.m.P} · CH ${b.m.CH} · G ${b.m.G} g</div></div></div>`).join('')}
+        ${r.blocks.some(b=>!['max','rec'].includes(b.k)&&b.m.gp<25)?'<p class="tiny" style="color:var(--warn)">⚠️ Algún bloque queda con menos del 25-30% de grasa: baja un poco el carbohidrato para proteger tus hormonas (pág. 184).</p>':''}
+        <p class="tiny">Mantenimiento = basal × 1,55 (factor del programa). Error típico ±10%: ajusta según tu progreso. Días de descanso: −10-15% de calorías y carbohidrato. Manzana: carbohidrato en la parte baja.</p>`:'<p class="tiny">Rellena edad, altura y peso.</p>'}</div></div></div>
+    ${g?`<div class="note">${g.v>25?'Con '+g.v+'% de grasa toca <b>definición</b>.':g.v<20?'Con '+g.v+'% de grasa: <b>volumen</b> o mantenimiento.':'Con '+g.v+'%: estás en el rango 20-25%; oscila volumen ↔ definición o mantente.'} Recarga semanal en definición cuando estés cerca del 20% (cada 2 semanas o ninguna si rondas el 25%).</div>`:''}
+    ${ci&&!ci.anticon?`<div class="note">🌙 ${CICLO_TXT[ci.fase].n}: ${CICLO_TXT[ci.fase].com.join(' ')}</div>`:''}
+    <p class="eyebrow" style="margin-top:18px">Dieta inversa (pág. 191)</p>
+    <div class="card"><div class="card-body body-open"><p class="tiny" style="margin-top:0">Si llevas meses comiendo poco, no saltes de golpe: +100 kcal cada 3-4 días hasta tu objetivo. Sube primero proteína (≥1,8 g/kg), luego grasa (≥30%), y después carbohidrato.</p>
+      <div class="grid2"><div class="field"><label>Comes ahora (kcal)</label><input type="number" id="di1" value="${S.cfg.comidaActual||''}"></div>
+      <div class="field"><label>Objetivo</label><select id="di2">${r?r.blocks.filter(b=>['mant','vol'].includes(b.k)).map(b=>`<option value="${Math.round(b.kcal)}">${b.n} · ${Math.round(b.kcal)}</option>`).join(''):''}</select></div></div><div id="dio"></div></div></div>
+    <p class="eyebrow" style="margin-top:18px">Alimentación por fase</p>
+    <div class="ntabs" id="nph">${[1,2,3,4].map(f=>`<button data-f="${f}" class="${nutPhase==f?'sel':''}">Fase ${['I','II','III','IV'][f-1]}</button>`).join('')}</div><div id="nphb"></div>
+    <p class="eyebrow" style="margin-top:18px">Qué comer</p><p class="tiny">Priorizar 50-60% · Moderar 30-40% · Eliminar ≤5-10% en cada grupo. Normas, no dogma. Regla de oro: si una espartana no lo reconocería como comida, no lo comas.</p><div id="foods"></div>
+    <p class="eyebrow" style="margin-top:18px">Reglas de oro</p>
+    <div class="card"><div class="card-body body-open">
+      <div class="kv"><span class="k">Post-entreno</span><span>La comida más importante del “timing”: batido + comida con almidón.</span></div>
+      <div class="kv"><span class="k">Nº comidas</span><span>Las menos posibles que te dejen llegar a calorías y macros sin pasar hambre.</span></div>
+      <div class="kv"><span class="k">Desayuno</span><span>Opcional. La cena es buen momento para rellenar glucógeno.</span></div>
+      <div class="kv"><span class="k">Agua</span><span>1-1,5 L por cada 1.000 kcal cuando buscas músculo. La sed manda.</span></div>
+      <div class="kv"><span class="k">Antojos</span><span>Magnesio citrato 400 mg o triptófano por la noche; chocolate >85% y fruta.</span></div></div></div>
+    <p class="tiny center" style="margin-top:14px">Basado en Guerrera Espartana (Fitness Revolucionario). Estimaciones orientativas, no consejo médico.</p>`;
+  app.querySelectorAll('[data-n]').forEach(i=>i.addEventListener('change',e=>{ S.cfg.nutri[e.target.dataset.n]=e.target.value; save(); renderDieta(); }));
+  wireBioPick(); document.querySelectorAll('#nd [data-d]').forEach(b=>b.onclick=()=>{ nutDay=b.dataset.d; renderDieta(); });
+  const di=()=>{ const a=+document.getElementById('di1').value, b=+document.getElementById('di2').value, o=document.getElementById('dio'); if(!(a>0&&b>0)){ o.innerHTML=''; return; }
+    S.cfg.comidaActual=a; save(); const diff=b-a; if(diff<=200){ o.innerHTML='<p class="tiny" style="color:var(--ok)">Estás a menos de 100-200 kcal: no necesitas dieta inversa, pasa directa al bloque.</p>'; return; }
+    const steps=Math.ceil(diff/100); o.innerHTML=`<div class="stat-line">Pasos de +100 kcal<b>${steps}</b></div><div class="stat-line">Duración (cada 4 días)<b>~${steps*4} días · ${formatEs(addDays(todayIso(),steps*4))}</b></div>`; };
+  document.getElementById('di1').oninput=di; document.getElementById('di2').onchange=di; di();
+  const PH={
+   1:`<div><span class="tag bloc">Según punto de partida</span></div>
+      <div class="kv"><span class="k">Objetivo</span><span>Sentar las bases: calcula tus números y registra unas semanas lo que comes (fatsecret, myfitnesspal).</span></div>
+      <div class="kv"><span class="k">>25% grasa</span><span>Bloque de <b>definición</b> (caso Helena).</span></div>
+      <div class="kv"><span class="k">~20-22%</span><span><b>Mantenimiento</b>: recomposición, más músculo y menos grasa (caso Atalanta).</span></div>
+      <div class="kv"><span class="k">Delgada y comiendo poco</span><span><b>Dieta inversa</b> +100 kcal/4 días hasta volumen (caso Cinista).</span></div>
+      <div class="kv"><span class="k">Suplementos</span><span><span class="tag sup">Proteína de suero 20-25 g post-entreno</span><span class="tag sup">Creatina 5 g días de entreno</span> Sin fase de carga.</span></div>`,
+   2:`<div class="kv"><span class="k">Estrategia</span><span>Igual que la Fase I; revisa tu progreso y <b>recalcula el mantenimiento</b> si cambió tu peso o grasa.</span></div>
+      <div class="kv"><span class="k">Recargas</span><span>Si llevas semanas en definición y te acercas al 20%: una recarga semanal, idealmente un día de entreno.</span></div>
+      <div class="kv"><span class="k">Descanso</span><span>Días sin entreno: −10-15% de calorías (p. ej. quita el batido, añade un snack).</span></div>
+      <div class="kv"><span class="k">Suplementos</span><span><span class="tag sup">Proteína de suero</span><span class="tag sup">Creatina 5 g</span></span></div>`,
+   3:`<div class="kv"><span class="k">Estrategia</span><span>Misma lógica: oscila entre 20 y 25% de grasa. Al llegar al 20%: volumen para ganar más músculo o mantenimiento si te gusta lo que ves.</span></div>
+      <div class="kv"><span class="k">Volumen</span><span>+10% · P 1,8-2 g/kg · CH 3-5 g/kg · 3 comidas + snack + batido.</span></div>
+      <div class="kv"><span class="k">Transición</span><span>Si la definición duró más de un mes, 1-2 semanas de dieta inversa antes del volumen.</span></div>
+      <div class="kv"><span class="k">Suplementos</span><span><span class="tag sup">Proteína de suero</span><span class="tag sup">Creatina 5 g</span></span></div>`,
+   4:`<div><span class="tag bloc">Definición máxima</span><span class="tag bloc">Recarga semanal</span></div>
+      <div class="kv"><span class="k">Requisitos</span><span>Buena base muscular, metabolismo sano, ≥2-3 meses de programa, grasa ≤20-22%. Si vienes de definición: 2 semanas de dieta inversa antes.</span></div>
+      <div class="kv"><span class="k">Calorías</span><span><b>−30%</b> sobre mantenimiento. Objetivo 16-18% de grasa. No bajes de 15-16%.</span></div>
+      <div class="kv"><span class="k">Macros</span><span>Proteína 30-40% de las kcal (2-2,3 g/kg) de comida real · CH: solo vegetales salvo post-entreno (100-150 g de patata o arroz + fruta) · grasa 40-60%.</span></div>
+      <div class="kv"><span class="k">Recarga</span><span>El día del complejo/guerrera: +10-15% sobre mantenimiento, CH 50-60% (almidones), ≥50% después de entrenar. No te peses al día siguiente.</span></div>
+      <div class="kv"><span class="k">Ayuno</span><span>Buen momento para 16/8 (2 comidas en 8 h). Post-entreno en ≤2-3 h.</span></div>
+      <div class="kv"><span class="k">Suplementos</span><span><b>Fuera</b> proteína y creatina (solo batido el día de recarga). <b>Añade</b> <span class="tag sup">Cafeína 200 mg</span><span class="tag sup">BCAA 4-6 g</span> 30 min antes de entrenar.</span></div>
+      <div class="kv"><span class="k">Al acabar</span><span>Dieta inversa 10-15 días: el metabolismo está frenado.</span></div>
+      <div class="note warn">Máximo un mes (≈ +2 semanas). Si notas cambios en tu menstruación, no presiones más.</div>`};
+  const pb=()=>{ document.getElementById('nphb').innerHTML=`<div class="card"><div class="card-body body-open">${PH[nutPhase]}</div></div>`; }; pb();
+  document.querySelectorAll('#nph [data-f]').forEach(b=>b.onclick=()=>{ nutPhase=b.dataset.f; document.querySelectorAll('#nph [data-f]').forEach(x=>x.classList.toggle('sel',x===b)); pb(); });
+  const fc=document.getElementById('foods'); FOODS.forEach(f=>{ const c=document.createElement('div'); c.className='card';
+    c.innerHTML=`<div class="card-head"><span class="ex-name" style="font-size:17px">${f.g}</span><span class="chev">▶</span></div><div class="card-body">
+      <div class="foodcol"><div class="lbl"><span class="fdot ok"></span>Priorizar</div><div class="items">${f.ok}</div></div>
+      <div class="foodcol"><div class="lbl"><span class="fdot mod"></span>Moderar</div><div class="items">${f.mod}</div></div>
+      <div class="foodcol"><div class="lbl"><span class="fdot no"></span>Eliminar</div><div class="items">${f.no}</div></div><p class="tiny">${f.nota}</p></div>`;
+    c.querySelector('.card-head').onclick=()=>c.classList.toggle('open'); fc.appendChild(c); }); }
+
+/* ---------- AJUSTES ---------- */
+function renderAjustes(){ const c=S.cfg;
+  app.innerHTML=`<p class="eyebrow">Ajustes</p><h2 class="h-big" style="font-size:24px">Tus parámetros</h2>
+  <p class="eyebrow">Fase activa</p>${faseSwitchHTML()}
+  <div class="card"><div class="card-body body-open"><p class="eyebrow">Fase II · barra</p>
+    <p class="tiny" style="margin-top:0">5RM estimado (cambiarlo recalcula el punto de partida de la Fase II)</p><div class="grid2">${rmFields()}</div>
+    <div class="grid2"><div class="field"><label>Descarga inicial (%)</label><input type="number" data-c="descarga" value="${Math.round(c.descarga*100)}"></div>
+      <div class="field"><label>Sesiones Fase II</label><input type="number" data-c="f2total" value="${c.f2total}" step="3"></div>
+      <div class="field"><label>Inc. pierna mes 1 (kg)</label><input type="number" data-i="inf1" value="${c.inc.inf1}" step="0.5"></div><div class="field"><label>Inc. torso mes 1 (kg)</label><input type="number" data-i="sup1" value="${c.inc.sup1}" step="0.5"></div>
+      <div class="field"><label>Inc. pierna mes 2 (kg)</label><input type="number" data-i="inf2" value="${c.inc.inf2}" step="0.5"></div><div class="field"><label>Inc. torso mes 2 (kg)</label><input type="number" data-i="sup2" value="${c.inc.sup2}" step="0.5"></div>
+      <div class="field"><label>Ir a sesión</label><input type="number" data-c="cur2" value="${S.f2.cur}" min="1"></div></div>
+    <p class="tiny">Pierna = sentadilla, peso muerto, hip thrust, lev. cadera · Torso = banca, militar, clean, remo (pág. 241).</p></div></div>
+  <div class="card"><div class="card-body body-open"><p class="eyebrow">Material y descansos</p><div class="grid2">
+    <div class="field"><label>Barra (kg)</label><input type="number" data-c="bar" value="${c.bar}" step="0.5"></div>
+    <div class="field"><label>Redondeo inicial (kg)</label><input type="number" data-c="minInc" value="${c.minInc}" step="0.5"></div>
+    <div class="field"><label>Descanso barra (s)</label><input type="number" data-c="restBarra" value="${c.restBarra}" step="15"></div>
+    <div class="field"><label>Descanso corporal (s)</label><input type="number" data-c="restCorp" value="${c.restCorp}" step="15"></div></div>
+    <div class="field"><label>Discos por lado (kg, separados por coma)</label><input type="text" data-c="plates" value="${c.plates.join(', ')}"></div>
+    <p class="tiny">El libro recomienda discos de 0,5 kg (o tobilleras) para progresar fino en el segundo mes.</p>
+    <label class="alt-toggle"><input type="checkbox" data-b="kettlebell" ${c.kettlebell?'checked':''}> Tengo kettlebells (HIIT 3 y 4)</label>
+    <label class="alt-toggle"><input type="checkbox" data-b="clean" ${c.clean?'checked':''}> Hago clean (si no, remo 3×5)</label>
+    <div class="field" style="margin-top:10px"><label>Fase I · días por semana</label><select data-c="f1modo"><option value="5d" ${c.f1modo==='5d'?'selected':''}>5 días (4 fuerza + 1 quema-grasa)</option><option value="4d" ${c.f1modo==='4d'?'selected':''}>4 días (3 + 1, ~5,5 semanas)</option></select></div>
+  </div></div>
+  <button class="btn" id="sv">Guardar cambios</button>
+  <div class="btn-row"><button class="btn ghost" id="ex">Exportar datos</button><button class="btn ghost" id="im">Importar</button></div><input type="file" id="imf" accept="application/json" style="display:none">
+  <button class="btn ghost" id="rph">↺ Reiniciar la fase activa (mantiene ajustes)</button>
+  <button class="btn deep" id="rs" style="margin-top:10px">Borrar todo</button>
+  <p class="tiny center" style="margin-top:10px">Los datos viven solo en este navegador (clave <code>guerrera_v2</code>). Exporta a menudo como copia de seguridad.</p>`;
+  wireFaseSw();
+  document.getElementById('sv').onclick=()=>{ readRm(app);
+    app.querySelectorAll('[data-c]').forEach(i=>{ const k=i.dataset.c, v=i.value;
+      if(k==='descarga') c.descarga=Math.min(0.6,Math.max(0,(+v||40)/100)); else if(k==='plates') c.plates=v.split(',').map(x=>parseFloat(x)).filter(x=>x>0).sort((a,b)=>b-a);
+      else if(k==='f1modo') c.f1modo=v; else if(k==='cur2') S.f2.cur=Math.max(1,parseInt(v)||1); else if(k==='f2total') c.f2total=Math.max(6,parseInt(v)||24); else c[k]=+v||c[k]; });
+    app.querySelectorAll('[data-i]').forEach(i=>{ c.inc[i.dataset.i]=+i.value||c.inc[i.dataset.i]; });
+    app.querySelectorAll('[data-b]').forEach(i=>{ c[i.dataset.b]=i.checked; }); _rc=null; save(); toast('Guardado'); render(); };
+  document.getElementById('ex').onclick=()=>{ const b=new Blob([JSON.stringify({_app:'GuerreraEspartana',_v:2,_exported:new Date().toISOString(),data:S},null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`guerrera-datos-${todayIso()}.json`; a.click(); toast('Exportado'); };
+  document.getElementById('im').onclick=()=>document.getElementById('imf').click();
+  document.getElementById('imf').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
+    rd.onload=()=>{ try{ const d=JSON.parse(rd.result), t=d.data||d; if(!t.cfg) throw 0; askConfirm('Esto REEMPLAZA todos los datos de este dispositivo. ¿Continuar?',()=>{ S=migrate(t); save(); view='hoy'; render(); toast('Datos restaurados'); },'Restaurar'); }catch(x){ toast('Archivo no válido'); } };
+    rd.readAsText(f); e.target.value=''; };
+  document.getElementById('rph').onclick=()=>askConfirm(`¿Reiniciar la Fase ${FASE_N[S.fase]}? Se borran sus registros.`,()=>{ const f=S.fase;
+    if(f===1) S.f1={cur:1,logs:{}}; if(f===2){ S.f2={cur:1,logs:{},started:todayIso()}; S.cfg.deloads={}; Object.keys(S.cardio).filter(k=>k.startsWith('2-')).forEach(k=>delete S.cardio[k]); }
+    if(f===3) S.f3={cur:1,logs:{},weights:S.f3.weights,started:todayIso()}; if(f===4) S.f4={cur:1,logs:{},weights:S.f4.weights,started:todayIso()};
+    save(); view='hoy'; render(); toast('Fase reiniciada'); },'Reiniciar');
+  document.getElementById('rs').onclick=()=>askConfirm('¿Borrar TODO y empezar de cero? No se puede deshacer.',()=>{ localStorage.removeItem(KEY); S=freshState(); view='hoy'; render(); },'Borrar'); }
+
+/* ---------- Arranque ---------- */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ view=b.dataset.view; if(view==='historial') histTab=null; if(view==='dieta') nutPhase=null; if(view==='hoy') f2Mode=null; render(); window.scrollTo(0,0); });
+document.getElementById('rest-skip').onclick=stopRest;
+render();
+</script>
+</body>
+</html>
